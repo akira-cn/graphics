@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>抽奖</title>
+  <style>
+    div, button {
+      font-size: 3rem;
+    }
+    canvas {
+      background: #000;
+    }
+    span {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div><button id="updateBtn">抽奖</button><span id="user"></span></div>
+  <canvas id="glDoodle" width="512" height="512"></canvas>
+  <script type="module">
+    import GLRenderer from './lib/gl-renderer.js';
+    const container = document.getElementById('glDoodle');
+    const doodle = new GLRenderer(container, {autoUpdate: false});
+    const width = 512,
+      height = 512;
+    const button = document.getElementById('updateBtn');
+    (async function() {
+      const textureCanvas = new OffscreenCanvas(width, height);
+      const ctx = textureCanvas.getContext('2d');
+      const program = await doodle.load('./lib/fragment.glsl');
+      doodle.useProgram(program);
+
+      button.addEventListener('click', () => {
+        const texture = doodle.createTexture(textureCanvas.transferToImageBitmap());
+        doodle.uniforms.resolution = [width, height];
+        doodle.uniforms.rate = 0.2; // 30% 中奖概率
+        doodle.uniforms.seed = Math.random(); // 随机种子
+        doodle.uniforms.texture = texture;
+        doodle.render();
+        doodle.deleteTexture(texture);
+        ctx.drawImage(doodle.canvas, 0, 0, width, height);
+      });
+    }());
+  </script>
+</body>
+</html>

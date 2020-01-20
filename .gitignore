@@ -1,0 +1,9 @@
+.DS_Store
+
+node_modules
+yarn.lock
+package-lock.json
+.docz
+.nyc_output
+coverage
+.vscode
