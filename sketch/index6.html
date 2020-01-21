@@ -8,27 +8,26 @@
 </head>
 <body>
   <script type="module">
-    import {pen, left, right, forward, render} from './lib/doodle.js';
+    import {pen, put, right, forward, render} from './lib/doodle.js';
 
-    const dep = 5;
-    pen(1);
-    function fractal(length, depth) {
-      if(depth <= 0) return forward(length);
-      const l = length / 3;
-      fractal(l, depth - 1);
-      left(60);
-      fractal(l, depth - 1);
-      right(120);
-      fractal(l, depth - 1);
-      left(60);
-      fractal(l, depth - 1);
+    const r = 0.8;
+    for(let i = 0; i < 180; i++) {
+      pen(1, `hsl(${2 * i},50%,50%)`);
+      put(0, 0);
+      right(-90);
+      forward(0.5 * r);
+      right(90);
+      forward(0.5 * r);
+      right(90);
+      forward(r);
+      right(90);
+      forward(r);
+      right(90);
+      forward(r);
+      right(90);
+      forward(0.5 * r);
+      right(2);
     }
-    left(60);
-    fractal(1, dep);
-    right(120);
-    fractal(1, dep);
-    right(120);
-    fractal(1, dep);
 
     {
       const width = 512,

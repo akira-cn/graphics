@@ -8,27 +8,30 @@
 </head>
 <body>
   <script type="module">
-    import {pen, left, right, forward, render} from './lib/doodle.js';
-
-    const dep = 5;
-    pen(1);
-    function fractal(length, depth) {
-      if(depth <= 0) return forward(length);
-      const l = length / 3;
-      fractal(l, depth - 1);
-      left(60);
-      fractal(l, depth - 1);
-      right(120);
-      fractal(l, depth - 1);
-      left(60);
-      fractal(l, depth - 1);
+    import {pen, put, left, right, forward, render} from './lib/doodle.js';
+    
+    pen(1, '#3a7');
+    put(0, -1);
+    left(90);
+    forward(1);
+    function tree(depth) {
+      const l = 0.1;
+      if(depth <= 0) return;
+      forward(l);
+      tree(depth - 1);
+      forward(-l);
+      left(30);
+      forward(l);
+      tree(depth - 1);
+      forward(-l);
+      right(60);
+      forward(l);
+      tree(depth - 1);
+      forward(-l);
+      left(30);
     }
-    left(60);
-    fractal(1, dep);
-    right(120);
-    fractal(1, dep);
-    right(120);
-    fractal(1, dep);
+
+    tree(10);
 
     {
       const width = 512,

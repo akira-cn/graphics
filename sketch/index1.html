@@ -8,18 +8,20 @@
 </head>
 <body>
   <script type="module">
-    import {pen, put, right, forward, render} from './lib/sketch.js';
+    import {pen, put, right, forward, render} from './lib/doodle.js';
 
     pen(1, 'black');
     put(0, 0);
     forward(0.5);
     right(90);
+    pen(2, 'red');
     forward(0.5);
-    // right(90);
-    // pen(12, 'red');
-    // forward(0.5);
-    // right(90);
-    // forward(0.5);
+    right(90);
+    pen(3, 'blue');
+    forward(0.5);
+    right(90);
+    pen(4, 'green');
+    forward(0.5);
 
     {
       const width = 512,
@@ -48,7 +50,7 @@
           } else if(command === 'put') {
             const {x, y} = project(args);
             ctx.moveTo(x, y);
-          } else if(command === 'line') {
+          } else if(command === 'forward') {
             const {x, y} = project(args);
             ctx.lineTo(x, y);
           }

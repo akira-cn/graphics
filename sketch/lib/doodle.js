@@ -47,7 +47,7 @@ export function forward(length) {
   position[1] += length * direction[1];
 
   commandList.push({
-    command: 'line',
+    command: 'forward',
     args: {
       x: position[0],
       y: position[1],
