@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>像素处理</title>
+</head>
+<body>
+  <canvas id="paper" width="0" height="0"></canvas>
+  <script type="module">
+    import {loadImage, getImageData, traverse, getPixelXY} from './lib/util.js';
+    import {transformColor, brightness, saturate} from './lib/color-matrix.js';
+
+    const canvas = document.getElementById('paper');
+    const context = canvas.getContext('2d');
+
+    (async function () {
+      const img = await loadImage('assets/girl1.jpg');
+      const textureImage = await loadImage('assets/explode.jpg');
+
+      const imageData = getImageData(img);
+      const texture = getImageData(textureImage);
+
+      traverse(imageData, ({r, g, b, a, x, y}) => {
+        const texColor = getPixelXY(texture, x, y);
+        const e = 0.212 * texColor[0] + 0.714 * texColor[1] + 0.074 * texColor[2];
+
+        return transformColor([r, g, b, a], brightness(0.3 + e), saturate(1.5));
+      });
+
+      canvas.width = imageData.width;
+      canvas.height = imageData.height;
+      context.putImageData(imageData, 0, 0);
+    }());
+  </script>
+</body>
+</html>

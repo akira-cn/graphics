@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>像素处理</title>
+</head>
+<body>
+  <canvas id="paper" width="0" height="0"></canvas>
+  <script type="module">
+    import {loadImage, getImageData, traverse} from './lib/util.js';
+
+    const canvas = document.getElementById('paper');
+    const context = canvas.getContext('2d');
+
+    (async function () {
+      const img = await loadImage('assets/girl1.jpg');
+      const imageData = getImageData(img);
+
+      traverse(imageData, ({r, g, b, a}) => {
+        const v = 0.212 * r + 0.714 * g + 0.074 * b;
+        return [v, v, v, a];
+      });
+
+      canvas.width = imageData.width;
+      canvas.height = imageData.height;
+      context.putImageData(imageData, 0, 0);
+    }());
+  </script>
+</body>
+</html>

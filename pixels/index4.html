@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>像素处理</title>
+</head>
+<body>
+  <canvas id="paper" width="0" height="0"></canvas>
+  <script type="module">
+    import {loadImage, getImageData, traverse, gaussianBlur} from './lib/util.js';
+    import {transformColor, grayscale, brightness, contrast, saturate} from './lib/color-matrix.js';
+
+    const canvas = document.getElementById('paper');
+    const context = canvas.getContext('2d');
+
+    (async function () {
+      const img = await loadImage('assets/girl2.jpg');
+
+      const imageData = getImageData(img);
+
+      gaussianBlur(imageData.data, imageData.width, imageData.height, 4);
+      traverse(imageData, ({r, g, b, a}) => {
+        return transformColor([r, g, b, a], grayscale(0.5), saturate(1.2), contrast(1.1), brightness(1.2));
+      });
+
+      canvas.width = imageData.width;
+      canvas.height = imageData.height;
+      context.putImageData(imageData, 0, 0);
+      // const bitmap = transferToImageBitmap(imageData);
+      // canvas.width = bitmap.width;
+      // canvas.height = bitmap.height;
+      // context.drawImage(bitmap, 0, 0);
+    }());
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Sketch</title>
+</head>
+<body>
+  <script type="module">
+    import {pen, put, left, right, forward, render} from './lib/doodle.js';
+
+    const radius = 0.5;
+    const edges = 200;
+    const angle = (edges - 2) * 180 / edges;
+    const step = 2 * radius * Math.cos(Math.PI * angle / 360);
+
+    pen(1);
+    put(0, radius);
+    left(90 - 0.5 * angle);
+    
+    for(let i = 0; i < edges; i++) {
+      right(180 - angle);
+      forward(step);
+    }
+
+    {
+      const width = 512,
+        height = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      document.body.appendChild(canvas);
+
+      render((commands) => {
+        const ctx = canvas.getContext('2d');
+        function project({x, y}) { // -1 ~ 1
+          return {
+            x: 0.5 * (x + 1) * canvas.width,
+            y: 0.5 * (1 - y) * canvas.height,
+          };
+        }
+
+        commands.forEach(({command, args}, idx) => {
+          if(command === 'pen') {
+            if(idx > 0) ctx.stroke();
+            const {color, lineWidth} = args;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+          } else if(command === 'put') {
+            const {x, y} = project(args);
+            ctx.moveTo(x, y);
+          } else if(command === 'forward') {
+            const {x, y} = project(args);
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+      });
+    }
+  </script>
+</body>
+</html>

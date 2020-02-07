@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Sketch</title>
+</head>
+<body>
+  <script type="module">
+    import {pen, put, right, forward, render} from './lib/doodle.js';
+
+    const c = 1 / Math.cos(Math.PI * 18 / 180);
+
+    pen(1);
+    put(0, 0.5);
+    right(72);
+    for(let i = 0; i < 5; i++) {
+      forward(c);
+      right(144);
+    }
+
+    {
+      const width = 512,
+        height = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      document.body.appendChild(canvas);
+
+      render((commands) => {
+        const ctx = canvas.getContext('2d');
+        function project({x, y}) { // -1 ~ 1
+          return {
+            x: 0.5 * (x + 1) * canvas.width,
+            y: 0.5 * (1 - y) * canvas.height,
+          };
+        }
+
+        commands.forEach(({command, args}, idx) => {
+          if(command === 'pen') {
+            if(idx > 0) ctx.stroke();
+            const {color, lineWidth} = args;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+          } else if(command === 'put') {
+            const {x, y} = project(args);
+            ctx.moveTo(x, y);
+          } else if(command === 'forward') {
+            const {x, y} = project(args);
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+      });
+    }
+  </script>
+</body>
+</html>
