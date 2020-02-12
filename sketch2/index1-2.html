@@ -7,10 +7,10 @@
   <title>Sketch</title>
 </head>
 <body>
-  <canvas width="512" height="512"></canvas>
+  <div style="width:512px;height:512px;"></div>
   <script type="module">
     import {pen, put, right, forward, render} from './lib/doodle.js';
-    import parse from './lib/parser/canvas.js';
+    import parse from './lib/parser/dom.js';
 
     const mode = 'points';
     pen(10, 'black', mode);
@@ -26,8 +26,8 @@
     pen(40, 'green', mode);
     forward(0.5);
 
-    const canvas = document.querySelector('canvas');
-    render(parse(canvas));
+    const container = document.querySelector('div');
+    render(parse(container));
   </script>
 </body>
 </html>

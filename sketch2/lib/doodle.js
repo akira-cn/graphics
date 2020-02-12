@@ -16,12 +16,23 @@ function rotate(deg) {
   direction[1] = x * s + y * c;
 }
 
+export function _vertices(...verticesArray) {
+  for(let i = 0; i < verticesArray.length; i += 2) {
+    const x = verticesArray[i];
+    const y = verticesArray[i + 1];
+    commandList.push({
+      command: i === 0 ? 'put' : 'forward',
+      args: {x, y},
+    });
+  }
+}
+
 let penWidth = 0;
-export function pen(lineWidth, strokeColor = 'black', fillColor = null) {
+export function pen(lineWidth, color = 'black', mode = 'line-strip') {
   lineWidth = lineWidth || 0;
   commandList.push({
     command: 'pen',
-    args: {fillColor, strokeColor, lineWidth},
+    args: {color, lineWidth, mode},
   });
   penWidth = lineWidth;
   put(...position);
