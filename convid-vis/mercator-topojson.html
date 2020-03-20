@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mercator Demo</title>
+</head>
+<body>
+  <script src="https://lib.baomitu.com/topojson/3.0.2/topojson.min.js"></script>
+  <canvas width="1024" height="512"></canvas>
+  <script>
+    /* globals topojson */
+    const width = 1024;
+    const height = 512;
+    function projection([longitude, latitude]) {
+      const x = width * (180 + longitude) / 360;
+      const y = height * (1.0 - (90 + latitude) / 180); // Canvas坐标系y轴朝下
+      return [x, y];
+    }
+
+    function drawPoints(ctx, points) {
+      ctx.beginPath();
+      ctx.moveTo(...points[0]);
+      for(let i = 1; i < points.length; i++) {
+        ctx.lineTo(...points[i]);
+      }
+      ctx.fill();
+    }
+    
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'black';
+
+    (async function () {
+      const worldData = await (await fetch('./assets/data/world-topojson.json')).json();
+      const countries = topojson.feature(worldData, worldData.objects.countries);
+      countries.features.forEach(({geometry}) => {
+        if(geometry.type === 'MultiPolygon') {
+          const coordinates = geometry.coordinates;
+          if(coordinates) {
+            coordinates.forEach((contours) => {
+              contours.forEach((path) => {
+                const points = path.map(projection);
+                drawPoints(ctx, points);
+              });
+            });
+          }
+        } else if(geometry.type === 'Polygon') {
+          const contours = geometry.coordinates;
+          contours.forEach((path) => {
+            const points = path.map(projection);
+            drawPoints(ctx, points);
+          });
+        }
+      });
+    }());
+  </script>
+</body>
+</html>
