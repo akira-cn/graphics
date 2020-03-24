@@ -6,13 +6,14 @@
   <title>Convid-vis Demo</title>
   <style>
     canvas {
-      width: 400px;
-      height: 200px;
+      width: 1200px;
+      height: 600px;
     }
   </style>
 </head>
 <body>
   <script src="https://lib.baomitu.com/topojson/3.0.2/topojson.min.js"></script>
+  <div id="dateInfo"></div>
   <canvas width="1024" height="512"></canvas>
   <script>
     /* globals topojson */
@@ -83,7 +84,7 @@
 
     function drawMap(ctx, countries, date) {
       date = formatDate(date);
-      console.log(date);
+      dateInfo.innerHTML = date;
       countries.features.forEach(({geometry, properties}) => {
         const convid = properties.convid ? properties.convid[date] : null;
         let confirmed;
