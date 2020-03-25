@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar graph</title>
+</head>
+<body>
+  <!--
+      dataset = {
+        current: [15, 11, 17, 25, 37],
+        total: [25, 26, 40, 45, 68],
+      }
+  -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="120px" height="240px" viewBox="0 0 60 100">
+    <g transform="translate(0, 100) scale(1, -1)">
+      <g>
+        <rect x="1" y="0" width="10" height="25" fill="#37c"/>
+        <rect x="13" y="0" width="10" height="26" fill="#37c"/>
+        <rect x="25" y="0" width="10" height="40" fill="#37c"/>
+        <rect x="37" y="0" width="10" height="45" fill="#37c"/>
+        <rect x="49" y="0" width="10" height="68" fill="#37c"/>
+      </g>
+      <g>
+        <rect x="1" y="0" width="10" height="15" fill="#3c7"/>
+        <rect x="13" y="0" width="10" height="11" fill="#3c7"/>
+        <rect x="25" y="0" width="10" height="17" fill="#3c7"/>
+        <rect x="37" y="0" width="10" height="25" fill="#3c7"/>
+        <rect x="49" y="0" width="10" height="37" fill="#3c7"/>
+      </g>
+    </g>
+  </svg>
+</body>
+</html>

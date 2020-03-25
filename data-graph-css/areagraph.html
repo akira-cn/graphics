@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar graph</title>
+  <style>
+    .areagraph {
+      display: inline-block;
+      width: 600px;
+      height: 300px;
+      background: rgba(192,23,57,0.3);
+      clip-path: polygon(
+        0% 100%,
+        0% 50%,
+        15% 20%,
+        30% 35%,
+        45% 25%,
+        60% 45%,
+        75% 30%,
+        90% 75%,
+        100% 90%,
+        100% 100%);
+    }
+
+    .areagraph::after {
+      content: ' ';
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      background: rgba(73, 172, 186, 0.7);
+      clip-path: polygon(
+        0% 100%,
+        0% 70%,
+        15% 50%,
+        30% 65%,
+        45% 45%,
+        60% 55%,
+        75% 80%,
+        90% 85%,
+        100% 95%,
+        100% 100%);
+    }   
+  </style>
+</head>
+<body>
+  <div class="chart areagraph">
+  </div>
+</body>
+</html>
