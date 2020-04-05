@@ -1,4 +1,4 @@
-import {Vector2D} from './lib/utils.js';
+import {Vector2D} from './lib/vector2d.js';
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
@@ -7,8 +7,8 @@ ctx.translate(0, canvas.height);
 ctx.scale(1, -1);
 ctx.lineCap = 'round';
 
-function drawTree(context, v0, length, thickness, rad, bias) {
-  const v = new Vector2D().rotate(rad).scale(length);
+function drawBranch(context, v0, length, thickness, dir, bias) {
+  const v = new Vector2D().rotate(dir).scale(length);
   const v1 = v0.copy().add(v);
 
   context.lineWidth = thickness;
@@ -18,11 +18,12 @@ function drawTree(context, v0, length, thickness, rad, bias) {
   context.stroke();
 
   if(thickness > 2) {
-    const left = Math.PI / 4 + 0.5 * (rad + 0.3) + bias * (Math.random() - 0.5);
-    drawTree(context, v1, length * 0.9, thickness * 0.8, left, bias * 0.9);
-    const right = Math.PI / 4 + 0.5 * (rad - 0.3) + bias * (Math.random() - 0.5);
-    drawTree(context, v1, length * 0.9, thickness * 0.8, right, bias * 0.9);
+    const left = Math.PI / 4 + 0.5 * (dir + 0.2) + bias * (Math.random() - 0.5);
+    drawBranch(context, v1, length * 0.9, thickness * 0.8, left, bias * 0.9);
+    const right = Math.PI / 4 + 0.5 * (dir - 0.2) + bias * (Math.random() - 0.5);
+    drawBranch(context, v1, length * 0.9, thickness * 0.8, right, bias * 0.9);
   }
+
   if(thickness < 5 && Math.random() < 0.3) {
     context.save();
     context.strokeStyle = '#c72c35';
@@ -37,4 +38,4 @@ function drawTree(context, v0, length, thickness, rad, bias) {
 }
 
 const v0 = new Vector2D(256, 0);
-drawTree(ctx, v0, 50, 10, 1, 3);
+drawBranch(ctx, v0, 50, 10, 1, 3);
