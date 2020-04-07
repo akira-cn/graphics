@@ -43,8 +43,12 @@ export class Vector2D extends Array {
     return this;
   }
 
-  dot(v) {
+  cross(v) {
     return this.x * v.y - v.x * this.y;
+  }
+
+  dot(v) {
+    return this.x * v.x + v.y * this.y;
   }
 
   normalize() {
