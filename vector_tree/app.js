@@ -1,4 +1,4 @@
-import {Vector2D} from './lib/vector2d.js';
+import {Vector2D} from '../common/lib/vector2d.js';
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
