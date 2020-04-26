@@ -142,8 +142,6 @@ __webpack_require__.r(__webpack_exports__);
 
 var GLSL_LIBS = {};
 
-var _renderFrameID = Symbol('renderFrameID');
-
 function mapTextureCoordinate(positions) {
   var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
   var texVertexData = [];
@@ -394,9 +392,9 @@ function () {
       if (this.program === program) {
         this.startRender = false;
 
-        if (this[_renderFrameID]) {
-          cancelAnimationFrame(this[_renderFrameID]);
-          delete this[_renderFrameID];
+        if (this._renderFrameID) {
+          cancelAnimationFrame(this._renderFrameID);
+          delete this._renderFrameID;
         }
 
         gl.useProgram(null);
@@ -530,6 +528,7 @@ function () {
         program._texCoordSize = Number(matched[1]);
       }
 
+      program._enableTextures = enableTextures && program._texCoordSize;
       var attributePattern = /^\s*attribute (\w+?)(\d*) (\w+)/gim;
       matched = vertexShader.match(attributePattern);
 
@@ -593,9 +592,9 @@ function () {
       var attrOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       this.startRender = false;
 
-      if (this[_renderFrameID]) {
-        cancelAnimationFrame(this[_renderFrameID]);
-        delete this[_renderFrameID];
+      if (this._renderFrameID) {
+        cancelAnimationFrame(this._renderFrameID);
+        delete this._renderFrameID;
       }
 
       var gl = this.gl;
@@ -902,7 +901,8 @@ function () {
 
       var img = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var gl = this.gl;
-      gl.activeTexture(gl.TEXTURE15);
+      this._max_texture_image_units = this._max_texture_image_units || gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+      gl.activeTexture(gl.TEXTURE0 + this._max_texture_image_units - 1);
       var texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -1060,7 +1060,7 @@ function () {
       }
 
       if (clearBuffer) gl.clear(gl.COLOR_BUFFER_BIT);
-      var lastFrameID = this[_renderFrameID];
+      var lastFrameID = this._renderFrameID;
 
       this._draw();
 
@@ -1068,8 +1068,8 @@ function () {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       }
 
-      if (this[_renderFrameID] === lastFrameID) {
-        this[_renderFrameID] = null;
+      if (this._renderFrameID === lastFrameID) {
+        this._renderFrameID = null;
       }
     }
   }, {
@@ -1077,8 +1077,8 @@ function () {
     value: function update() {
       if (!this.startRender) return;
 
-      if (this[_renderFrameID] == null) {
-        this[_renderFrameID] = requestAnimationFrame(this.render.bind(this));
+      if (this._renderFrameID == null) {
+        this._renderFrameID = requestAnimationFrame(this.render.bind(this));
       }
     }
   }, {
