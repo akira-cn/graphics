@@ -24,7 +24,7 @@ export class Vector2D extends Array {
   }
 
   get dir() {
-    return Math.PI + Math.atan2(this.y, this.x);
+    return Math.atan2(this.y, this.x);
   }
 
   copy() {
