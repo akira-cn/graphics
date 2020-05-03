@@ -164,7 +164,13 @@ function clearBuffers(gl, program) {
 
 function bindTexture(gl, texture, i) {
   gl.activeTexture(gl.TEXTURE0 + i);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  if (Array.isArray(texture._img)) {
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+  } else {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+  }
+
   return texture;
 }
 
@@ -180,7 +186,14 @@ var uniformTypeMap = {
   mat2: 'Matrix2fv',
   mat3: 'Matrix3fv',
   mat4: 'Matrix4fv',
-  sampler2D: 'sampler2D'
+  sampler1D: 'sampler1D',
+  sampler2D: 'sampler2D',
+  sampler3D: 'sampler3D',
+  samplerCube: 'samplerCube',
+  sampler1DShadow: 'sampler1DShadow',
+  sampler2DShadow: 'sampler2DShadow',
+  sampler2DRect: 'sampler2DRect',
+  sampler2DRectShadow: 'sampler2DRectShadow'
 };
 
 var Renderer =
@@ -258,7 +271,7 @@ function () {
       var value;
       var that = this;
 
-      if (type === 'sampler2D') {
+      if (/^sampler/.test(type)) {
         var samplerMap = program._samplerMap;
         var textures = program._bindTextures;
         Object.defineProperty(program.uniforms, name, {
@@ -496,7 +509,7 @@ function () {
 
       // this.deleteProgram();
       // this._events = {};
-      var enableTextures = /^\s*uniform\s+sampler2D/mg.test(fragmentShader);
+      var enableTextures = /^\s*uniform\s+sampler/mg.test(fragmentShader);
       if (fragmentShader == null) fragmentShader = _default_frag_glsl__WEBPACK_IMPORTED_MODULE_8___default.a;
       if (vertexShader == null) vertexShader = enableTextures ? _default_feeback_vert_glsl__WEBPACK_IMPORTED_MODULE_9___default.a : _default_vert_glsl__WEBPACK_IMPORTED_MODULE_7___default.a;
       var gl = this.gl;
@@ -511,30 +524,28 @@ function () {
       program._attribute = {};
       program.uniforms = {};
       program._samplerMap = {};
-      program._bindTextures = [];
-      program._enableTextures = enableTextures; // console.log(vertexShader);
+      program._bindTextures = []; // console.log(vertexShader);
 
-      var pattern = new RegExp("attribute vec(\\d) ".concat(this.options.vertexPosition), 'im');
+      var pattern = new RegExp("(?:attribute|in) vec(\\d) ".concat(this.options.vertexPosition), 'im');
       var matched = vertexShader.match(pattern);
 
       if (matched) {
         program._dimension = Number(matched[1]);
       }
 
-      var texCoordPattern = new RegExp("attribute vec(\\d) ".concat(this.options.vertexTextureCoord), 'im');
+      var texCoordPattern = new RegExp("(?:attribute|in) vec(\\d) ".concat(this.options.vertexTextureCoord), 'im');
       matched = vertexShader.match(texCoordPattern);
 
       if (matched) {
         program._texCoordSize = Number(matched[1]);
       }
 
-      program._enableTextures = enableTextures && program._texCoordSize;
-      var attributePattern = /^\s*attribute (\w+?)(\d*) (\w+)/gim;
+      var attributePattern = /^\s*(?:attribute|in) (\w+?)(\d*) (\w+)/gim;
       matched = vertexShader.match(attributePattern);
 
       if (matched) {
         for (var i = 0; i < matched.length; i++) {
-          var patt = /^\s*attribute (\w+?)(\d*) (\w+)/im;
+          var patt = /^\s*(?:attribute|in) (\w+?)(\d*) (\w+)/im;
 
           var _matched = matched[i].match(patt);
 
@@ -578,6 +589,8 @@ function () {
       });
       program._buffers.verticesBuffer = gl.createBuffer();
       program._buffers.cellsBuffer = gl.createBuffer();
+      var vTexCoord = gl.getAttribLocation(program, this.options.vertexTextureCoord);
+      program._enableTextures = vTexCoord >= 0;
 
       if (program._enableTextures) {
         program._buffers.texCoordBuffer = gl.createBuffer();
@@ -900,30 +913,61 @@ function () {
       var _this4 = this;
 
       var img = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      var _ref10 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref10$wrapS = _ref10.wrapS,
+          wrapS = _ref10$wrapS === void 0 ? this.gl.CLAMP_TO_EDGE : _ref10$wrapS,
+          _ref10$wrapT = _ref10.wrapT,
+          wrapT = _ref10$wrapT === void 0 ? this.gl.CLAMP_TO_EDGE : _ref10$wrapT,
+          _ref10$minFilter = _ref10.minFilter,
+          minFilter = _ref10$minFilter === void 0 ? this.gl.LINEAR : _ref10$minFilter,
+          _ref10$magFilter = _ref10.magFilter,
+          magFilter = _ref10$magFilter === void 0 ? this.gl.LINEAR : _ref10$magFilter;
+
       var gl = this.gl;
+      var target = Array.isArray(img) ? gl.TEXTURE_CUBE_MAP : gl.TEXTURE_2D;
       this._max_texture_image_units = this._max_texture_image_units || gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
       gl.activeTexture(gl.TEXTURE0 + this._max_texture_image_units - 1);
       var texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.bindTexture(target, texture);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       var _this$canvas = this.canvas,
           width = _this$canvas.width,
           height = _this$canvas.height;
 
       if (img) {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        if (target === gl.TEXTURE_CUBE_MAP) {
+          // For cube maps
+          for (var i = 0; i < 6; i++) {
+            gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img[i]);
+          }
+        } else {
+          gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        }
+      } else if (target === gl.TEXTURE_CUBE_MAP) {
+        // For cube maps
+        for (var _i = 0; _i < 6; _i++) {
+          this.gl.texImage2D(this.gl.TEXTURE_CUBE_MAP_POSITIVE_X + _i, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        }
       } else {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texImage2D(target, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       } // gl.NEAREST is also allowed, instead of gl.LINEAR, as neither mipmap.
 
 
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); // Prevents s-coordinate wrapping (repeating).
+      gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, minFilter);
+      gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, magFilter); // Prevents s-coordinate wrapping (repeating).
 
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // Prevents t-coordinate wrapping (repeating).
+      gl.texParameteri(target, gl.TEXTURE_WRAP_S, wrapS); // Prevents t-coordinate wrapping (repeating).
 
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      gl.texParameteri(target, gl.TEXTURE_WRAP_T, wrapT);
+
+      if (target === gl.TEXTURE_CUBE_MAP) {
+        // gl.texParameteri(target, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE);
+        img.width = img[0].width;
+        img.height = img[0].height;
+      }
+
+      gl.bindTexture(target, null);
       texture._img = img || {
         width: width,
         height: height
@@ -949,8 +993,8 @@ function () {
   }, {
     key: "loadTexture",
     value: function loadTexture(source) {
-      var _ref10,
-          _ref10$useImageBitmap,
+      var _ref11,
+          _ref11$useImageBitmap,
           useImageBitmap,
           img,
           _args4 = arguments;
@@ -959,7 +1003,7 @@ function () {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              _ref10 = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {}, _ref10$useImageBitmap = _ref10.useImageBitmap, useImageBitmap = _ref10$useImageBitmap === void 0 ? true : _ref10$useImageBitmap;
+              _ref11 = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : {}, _ref11$useImageBitmap = _ref11.useImageBitmap, useImageBitmap = _ref11$useImageBitmap === void 0 ? true : _ref11$useImageBitmap;
               _context4.next = 3;
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(Renderer.loadImage(source, {
                 useImageBitmap: useImageBitmap
@@ -979,15 +1023,15 @@ function () {
   }, {
     key: "createFBO",
     value: function createFBO() {
-      var _ref11 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          _ref11$color = _ref11.color,
-          color = _ref11$color === void 0 ? 1 : _ref11$color,
-          _ref11$blend = _ref11.blend,
-          blend = _ref11$blend === void 0 ? false : _ref11$blend,
-          _ref11$depth = _ref11.depth,
-          depth = _ref11$depth === void 0 ? this.options.depth !== false : _ref11$depth,
-          _ref11$stencil = _ref11.stencil,
-          stencil = _ref11$stencil === void 0 ? !!this.options.stencil : _ref11$stencil;
+      var _ref12 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          _ref12$color = _ref12.color,
+          color = _ref12$color === void 0 ? 1 : _ref12$color,
+          _ref12$blend = _ref12.blend,
+          blend = _ref12$blend === void 0 ? false : _ref12$blend,
+          _ref12$depth = _ref12.depth,
+          depth = _ref12$depth === void 0 ? this.options.depth !== false : _ref12$depth,
+          _ref12$stencil = _ref12.stencil,
+          stencil = _ref12$stencil === void 0 ? !!this.options.stencil : _ref12$stencil;
 
       var gl = this.gl;
       var buffer = gl.createFramebuffer();
@@ -1042,9 +1086,9 @@ function () {
   }, {
     key: "render",
     value: function render() {
-      var _ref12 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          _ref12$clearBuffer = _ref12.clearBuffer,
-          clearBuffer = _ref12$clearBuffer === void 0 ? true : _ref12$clearBuffer;
+      var _ref13 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          _ref13$clearBuffer = _ref13.clearBuffer,
+          clearBuffer = _ref13$clearBuffer === void 0 ? true : _ref13$clearBuffer;
 
       this.startRender = true;
       var gl = this.gl;
@@ -1059,7 +1103,13 @@ function () {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
       }
 
-      if (clearBuffer) gl.clear(gl.COLOR_BUFFER_BIT);
+      var depth = this.options.depth;
+
+      if (depth) {
+        gl.enable(gl.DEPTH_TEST);
+      }
+
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT | (this.depth ? this.gl.DEPTH_BUFFER_BIT : 0) | (this.stencil ? this.gl.STENCIL_BUFFER_BIT : 0));
       var lastFrameID = this._renderFrameID;
 
       this._draw();
