@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>噪声</title>
+</head>
+<body>
+  <canvas width="512" height="512"></canvas>
+  <script src="../common/lib/gl-renderer.js"></script>
+  <script>
+    const vertex = `
+      attribute vec2 a_vertexPosition;
+      attribute vec2 uv;
+
+      varying vec2 vUv;
+
+      void main() {
+        gl_PointSize = 1.0;
+        vUv = uv;
+        gl_Position = vec4(a_vertexPosition, 1, 1);
+      }
+    `;
+
+    const fragment = `
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      varying vec2 vUv;
+      uniform float uTime;
+      
+      float random (vec2 st) {
+          return fract(sin(dot(st.xy,
+                              vec2(12.9898,78.233)))*
+              43758.5453123);
+      }
+
+      highp float noise(vec2 st) {
+          vec2 i = floor(st);
+          vec2 f = fract(st);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix( mix( random( i + vec2(0.0,0.0) ),
+                          random( i + vec2(1.0,0.0) ), u.x),
+                      mix( random( i + vec2(0.0,1.0) ),
+                          random( i + vec2(1.0,1.0) ), u.x), u.y);
+      }
+
+      void main() {
+          vec2 st = mix(vec2(-10, -10), vec2(10, 10), vUv);
+          float d = distance(st, vec2(0));
+          d *= noise(uTime + st);
+          d = smoothstep(0.0, 1.0, d) - step(1.0, d);
+          gl_FragColor.rgb = vec3(d);
+          gl_FragColor.a = 1.0;
+      }
+    `;
+
+    const canvas = document.querySelector('canvas');
+    const renderer = new GlRenderer(canvas);
+
+    // load fragment shader and createProgram
+    const program = renderer.compileSync(fragment, vertex);
+    renderer.useProgram(program);
+    renderer.uniforms.uTime = 0.0;
+
+    requestAnimationFrame(function update(t) {
+      renderer.uniforms.uTime = t / 1000;
+      requestAnimationFrame(update);
+    });
+
+    renderer.setMeshData([{
+      positions: [
+        [-1, -1],
+        [-1, 1],
+        [1, 1],
+        [1, -1],
+      ],
+      attributes: {
+        uv: [
+          [0, 0],
+          [0, 1],
+          [1, 1],
+          [1, 0],
+        ],
+      },
+      cells: [[0, 1, 2], [2, 0, 3]],
+    }]);
+
+    renderer.render();
+  </script>
+</body>
+</html>
