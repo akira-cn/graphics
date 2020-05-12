@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      width: 300px;
+    }
+    .block {
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      background: blue;
+      flex-shrink: 0;
+      transform-origin: 50% 50%;
+    }
+    .animate {
+      animation: mymove 3s cubic-bezier(0.5, -1.5, 0.5, 2.5) forwards;
+    }
+    @keyframes mymove {
+      from {left: 100px}
+      to {left: 400px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="block"></div>
+  </div>
+  <script type="module">
+    const block = document.querySelector('.block');
+    document.addEventListener('click', () => {
+      block.className = 'block animate';
+    }, {once: true});
+  </script>
+</body>
+</html>

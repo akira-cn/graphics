@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .block {
+      width: 100px;
+      height: 100px;
+      top: 100px;
+      left: 100px;
+      transform-origin: 50% 50%;
+      position: absolute;
+      background: blue;
+    }
+  </style>
+</head>
+<body>
+  <div class="block"></div>
+  <script>
+  const block = document.querySelector('.block');
+  let rotation = 0;
+  requestAnimationFrame(function update() {
+    block.style.transform = `rotate(${rotation++}deg)`;
+    requestAnimationFrame(update);
+  });
+  </script>
+</body>
+</html>
