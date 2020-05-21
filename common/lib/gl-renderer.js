@@ -1109,7 +1109,7 @@ function () {
         gl.enable(gl.DEPTH_TEST);
       }
 
-      this.gl.clear(this.gl.COLOR_BUFFER_BIT | (this.depth ? this.gl.DEPTH_BUFFER_BIT : 0) | (this.stencil ? this.gl.STENCIL_BUFFER_BIT : 0));
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT | (depth ? this.gl.DEPTH_BUFFER_BIT : 0) | (this.options.stencil ? this.gl.STENCIL_BUFFER_BIT : 0));
       var lastFrameID = this._renderFrameID;
 
       this._draw();
