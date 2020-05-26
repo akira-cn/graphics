@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D绘图</title>
+</head>
+<body>
+  <script src="../common/lib/gl-renderer.js"></script>
+  <canvas width="512" height="512" style="border: solid"></canvas>
+  <script type="module">
+    import {multiply} from '../common/lib/math/functions/Mat4Func.js';
+    import {cross, subtract, normalize} from '../common/lib/math/functions/Vec3Func.js';
+    import {normalFromMat4} from '../common/lib/math/functions/Mat3Func.js';
+
+    const vertex = `
+      attribute vec3 a_vertexPosition;
+      attribute vec4 color;
+      attribute vec3 normal;
+
+      varying vec4 vColor;
+      varying float vCos;
+      uniform mat4 projectionMatrix;
+      uniform mat4 modelMatrix;
+      uniform mat3 normalMatrix;
+      
+      const vec3 lightPosition = vec3(10, 0, 0);
+
+      void main() {
+        gl_PointSize = 1.0;
+        vColor = color;
+        vec4 pos =  modelMatrix * vec4(a_vertexPosition, 1.0);
+        vec3 invLight = lightPosition - pos.xyz;
+        vec3 norm = normalize(normalMatrix * normal);
+        vCos = max(dot(normalize(invLight), norm), 0.0);
+        gl_Position = projectionMatrix * pos;
+      }
+    `;
+    const fragment = `
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      uniform vec4 lightColor;
+      varying vec4 vColor;
+      varying float vCos;
+
+      void main() {
+        gl_FragColor.rgb = vColor.rgb + vCos * lightColor.a * lightColor.rgb;
+        gl_FragColor.a = vColor.a;
+      }
+    `;
+
+    const canvas = document.querySelector('canvas');
+    const renderer = new GlRenderer(canvas, {
+      depth: true,
+    });
+    const program = renderer.compileSync(fragment, vertex);
+    renderer.useProgram(program);
+
+    function cylinder(radius = 1.0, height = 1.0, segments = 30, colorCap = [0, 0, 1, 1], colorSide = [1, 0, 0, 1]) {
+      const positions = [];
+      const cells = [];
+      const color = [];
+      const cap = [[0, 0]];
+      const h = 0.5 * height;
+      const normal = [];
+
+      // 顶和底的圆
+      for(let i = 0; i <= segments; i++) {
+        const theta = Math.PI * 2 * i / segments;
+        const p = [radius * Math.cos(theta), radius * Math.sin(theta)];
+        cap.push(p);
+      }
+
+      positions.push(...cap.map(([x, y]) => [x, y, -h]));
+      normal.push(...cap.map(() => [0, 0, -1]));
+      for(let i = 1; i < cap.length - 1; i++) {
+        cells.push([0, i, i + 1]);
+      }
+      cells.push([0, cap.length - 1, 1]);
+
+      let offset = positions.length;
+      positions.push(...cap.map(([x, y]) => [x, y, h]));
+      normal.push(...cap.map(() => [0, 0, 1]));
+      for(let i = 1; i < cap.length - 1; i++) {
+        cells.push([offset, offset + i, offset + i + 1]);
+      }
+      cells.push([offset, offset + cap.length - 1, offset + 1]);
+
+      color.push(...positions.map(() => colorCap));
+
+      const tmp1 = [];
+      const tmp2 = [];
+      // 侧面
+      offset = positions.length;
+      for(let i = 1; i < cap.length; i++) {
+        const a = [...cap[i], h];
+        const b = [...cap[i], -h];
+        const nextIdx = i < cap.length - 1 ? i + 1 : 1;
+        const c = [...cap[nextIdx], -h];
+        const d = [...cap[nextIdx], h];
+
+        positions.push(a, b, c, d);
+
+        const norm = [];
+        cross(norm, subtract(tmp1, b, a), subtract(tmp2, c, a));
+        normalize(norm, norm);
+        normal.push(norm, norm, norm, norm);
+
+        color.push(colorSide, colorSide, colorSide, colorSide);
+        cells.push([offset, offset + 1, offset + 2], [offset, offset + 2, offset + 3]);
+        offset += 4;
+      }
+
+      return {positions, cells, color, normal};
+    }
+
+    const geometry = cylinder(0.5, 1.0, 30, [0, 0, 1, 1], [0.5, 0.5, 0.5, 1]);
+
+    renderer.uniforms.projectionMatrix = [
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, -1, 0,
+      0, 0, 0, 1,
+    ];
+
+    renderer.uniforms.lightColor = [1, 0, 0, 0.8];
+
+    function fromRotation(rotationX, rotationY, rotationZ) {
+      let c = Math.cos(rotationX);
+      let s = Math.sin(rotationX);
+      const rx = [
+        1, 0, 0, 0,
+        0, c, s, 0,
+        0, -s, c, 0,
+        0, 0, 0, 1,
+      ];
+
+      c = Math.cos(rotationY);
+      s = Math.sin(rotationY);
+      const ry = [
+        c, 0, s, 0,
+        0, 1, 0, 0,
+        -s, 0, c, 0,
+        0, 0, 0, 1,
+      ];
+
+      c = Math.cos(rotationZ);
+      s = Math.sin(rotationZ);
+      const rz = [
+        c, s, 0, 0,
+        -s, c, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1,
+      ];
+
+      const ret = [];
+      multiply(ret, rx, ry);
+      multiply(ret, ret, rz);
+
+      return ret;
+    }
+
+    renderer.setMeshData([{
+      positions: geometry.positions,
+      attributes: {
+        color: geometry.color,
+        normal: geometry.normal,
+      },
+      cells: geometry.cells,
+    }]);
+
+    const rotationX = 0.5;
+    const rotationY = 0.5;
+    const rotationZ = 0;
+
+    function update() {
+      const modelMatrix = fromRotation(rotationX, rotationY, rotationZ);
+      modelMatrix[12] = 0.5;
+      modelMatrix[13] = 0.5;
+      modelMatrix[14] = 0.5;
+      renderer.uniforms.modelMatrix = modelMatrix;
+      renderer.uniforms.normalMatrix = normalFromMat4([], modelMatrix);
+      requestAnimationFrame(update);
+    }
+    update();
+
+    renderer.render();
+  </script>
+</body>
+</html>
