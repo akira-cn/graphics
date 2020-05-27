@@ -39,8 +39,15 @@
       uniform mat4 modelViewMatrix;
       uniform mat4 projectionMatrix;
       uniform mat3 normalMatrix;
+      
+      varying vec3 vNormal;
+      varying vec3 vPos;
+
       void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vec4 pos = modelViewMatrix * vec4(position, 1.0);
+        vPos = pos.xyz;
+        vNormal = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * pos;
       }
     `;
 
@@ -49,43 +56,79 @@
 
       uniform vec3 ambientLight;
       uniform vec3 materialReflection;
+      uniform vec3 pointLightColor;
+      uniform vec3 pointLightPosition;
+      uniform mat4 viewMatrix;
+      uniform vec3 pointLightDecayFactor;
+
+      varying vec3 vNormal;
+      varying vec3 vPos;
 
       void main() {
-        gl_FragColor.rgb = ambientLight * materialReflection;
+        // 光线到点坐标的方向
+        vec3 dir = (viewMatrix * vec4(pointLightPosition, 1.0)).xyz - vPos;
+        
+        // 光线到点坐标的距离，用来计算衰减
+        float dis = length(dir);
+
+        // 与法线夹角余弦
+        float cos = max(dot(normalize(dir), vNormal), 0.0);
+
+        // 计算衰减
+        float decay = min(1.0, 1.0 /
+          (pointLightDecayFactor.x * pow(dis, 2.0) + pointLightDecayFactor.y * dis + pointLightDecayFactor.z));
+        
+        // 计算漫反射
+        vec3 diffuse = decay * cos * pointLightColor;
+        
+        // 合成颜色
+        gl_FragColor.rgb = (ambientLight + diffuse) * materialReflection;
         gl_FragColor.a = 1.0;
       }
     `;
+
+    const ambientLight = {value: [0.5, 0.5, 0.5]};
+
+    const directional = {
+      pointLightPosition: {value: [3, 3, 0]},
+      pointLightColor: {value: [1, 1, 1]},
+      pointLightDecayFactor: {value: [0.05, 0, 1]},
+    };
 
     const program1 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [0, 0, 1]},
+        ...directional,
       },
     });
     const program2 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [1, 0, 1]},
+        ...directional,
       },
     });
     const program3 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [0, 0.5, 0]},
+        ...directional,
       },
     });
     const program4 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [1, 0, 0]},
+        ...directional,
       },
     });
 

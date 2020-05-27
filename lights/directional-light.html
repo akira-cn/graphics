@@ -38,8 +38,20 @@
       attribute vec3 normal;
       uniform mat4 modelViewMatrix;
       uniform mat4 projectionMatrix;
+      uniform mat4 viewMatrix;
       uniform mat3 normalMatrix;
+      uniform vec3 directionalLight;
+      
+      varying vec3 vNormal;
+      varying vec3 vDir;
+
       void main() {
+        // 计算光线方向
+        vec4 invDirectional = viewMatrix * vec4(directionalLight, 0.0);
+        vDir = -invDirectional.xyz;
+
+        // 计算法向量
+        vNormal = normalize(normalMatrix * normal);
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `;
@@ -49,43 +61,65 @@
 
       uniform vec3 ambientLight;
       uniform vec3 materialReflection;
+      uniform vec3 directionalLightColor;
+
+      varying vec3 vNormal;
+      varying vec3 vDir;
 
       void main() {
-        gl_FragColor.rgb = ambientLight * materialReflection;
+        // 求光线与法线夹角的余弦
+        float cos = max(dot(normalize(vDir), vNormal), 0.0);
+
+        // 计算漫反射
+        vec3 diffuse = cos * directionalLightColor;
+
+        // 合成颜色
+        gl_FragColor.rgb = (ambientLight + diffuse) * materialReflection;
         gl_FragColor.a = 1.0;
       }
     `;
+
+    const ambientLight = {value: [0.5, 0.5, 0.5]};
+
+    const directional = {
+      directionalLight: {value: [1, 0, 0]},
+      directionalLightColor: {value: [1, 1, 1]},
+    };
 
     const program1 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [0, 0, 1]},
+        ...directional,
       },
     });
     const program2 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [1, 0, 1]},
+        ...directional,
       },
     });
     const program3 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [0, 0.5, 0]},
+        ...directional,
       },
     });
     const program4 = new Program(gl, {
       vertex,
       fragment,
       uniforms: {
-        ambientLight: {value: [1, 1, 1]},
+        ambientLight,
         materialReflection: {value: [1, 0, 0]},
+        ...directional,
       },
     });
 
