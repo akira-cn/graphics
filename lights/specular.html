@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ogl</title>
+</head>
+<body>
+  <canvas width="512" height="512"></canvas>
+  <script type="module">
+    import {Renderer, Camera, Transform, Program, Sphere, Box, Cylinder, Torus, Mesh, Orbit, Color} from '../common/lib/ogl/index.mjs';
+    import * as dat from '../common/lib/dat.gui.js';
+
+    const canvas = document.querySelector('canvas');
+    const renderer = new Renderer({
+      canvas,
+      width: 512,
+      height: 512,
+    });
+
+    const gl = renderer.gl;
+    gl.clearColor(1, 1, 1, 1);
+    const camera = new Camera(gl, {fov: 35});
+    camera.position.set(0, 1, 7);
+    camera.lookAt([0, 0, 0]);
+    window.camera = camera;
+
+    const scene = new Transform();
+    
+    const sphereGeometry = new Sphere(gl, {widthSegments: 60});
+    const cubeGeometry = new Box(gl);
+    const cylinderGeometry = new Cylinder(gl);
+    const torusGeometry = new Torus(gl);
+
+    const vertex = /* glsl */ `
+      precision highp float;
+
+      attribute vec3 position;
+      attribute vec3 normal;
+      uniform mat4 modelViewMatrix;
+      uniform mat4 viewMatrix;
+      uniform mat4 projectionMatrix;
+      uniform mat3 normalMatrix;
+      uniform vec3 cameraPosition;
+      
+      varying vec3 vNormal;
+      varying vec3 vPos;
+      varying vec3 vCameraPos;
+
+      void main() {
+        vec4 pos = modelViewMatrix * vec4(position, 1.0);
+        vPos = pos.xyz;
+        vCameraPos = (viewMatrix * vec4(cameraPosition, 1.0)).xyz;
+        vNormal = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * pos;
+      }
+    `;
+
+    const fragment = /* glsl */ `
+      precision highp float;
+
+      uniform vec3 ambientLight;
+      uniform vec3 materialReflection;
+      uniform vec3 pointLightColor;
+      uniform vec3 pointLightPosition;
+      uniform mat4 viewMatrix;
+      uniform vec3 pointLightDecayFactor;
+
+      varying vec3 vNormal;
+      varying vec3 vPos;
+      varying vec3 vCameraPos;
+
+      void main() {
+        // 光线到点坐标的方向
+        vec3 dir = (viewMatrix * vec4(pointLightPosition, 1.0)).xyz - vPos;
+        
+        // 光线到点坐标的距离，用来计算衰减
+        float dis = length(dir);
+
+        dir = normalize(dir);
+
+        // 与法线夹角余弦
+        float cos = max(dot(dir, vNormal), 0.0);
+
+        // 反射光线
+        vec3 reflectionLight = reflect(-dir, vNormal);
+        vec3 eyeDirection = vCameraPos - vPos;
+        eyeDirection = normalize(eyeDirection);
+        // 与视线夹角余弦
+        float eyeCos = max(dot(eyeDirection, reflectionLight), 0.0);
+        // 镜面反射
+        float specular = 2.0 *  pow(eyeCos, 50.0);
+
+        // 计算衰减
+        float decay = min(1.0, 1.0 /
+          (pointLightDecayFactor.x * pow(dis, 2.0) + pointLightDecayFactor.y * dis + pointLightDecayFactor.z));
+        
+        // 计算漫反射
+        vec3 diffuse = decay * cos * pointLightColor;
+
+        
+        // 合成颜色
+        gl_FragColor.rgb = specular + (ambientLight + diffuse) * materialReflection;
+        gl_FragColor.a = 1.0;
+      }
+    `;
+
+    const ambientLight = {value: [0.5, 0.5, 0.5]};
+
+    const directional = {
+      pointLightPosition: {value: [3, 3, 0]},
+      pointLightColor: {value: [0.5, 0.5, 0.5]},
+      pointLightDecayFactor: {value: [0, 0, 1]},
+    };
+
+    const program1 = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        ambientLight,
+        materialReflection: {value: [0, 0, 1]},
+        ...directional,
+      },
+    });
+    const program2 = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        ambientLight,
+        materialReflection: {value: [1, 0, 1]},
+        ...directional,
+      },
+    });
+    const program3 = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        ambientLight,
+        materialReflection: {value: [0, 0.5, 0]},
+        ...directional,
+      },
+    });
+    const program4 = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        ambientLight,
+        materialReflection: {value: [1, 0, 0]},
+        ...directional,
+      },
+    });
+
+    const controls = new Orbit(camera);
+
+    const torus = new Mesh(gl, {geometry: torusGeometry, program: program1});
+    torus.position.set(0, 1.3, 0);
+    torus.setParent(scene);
+
+    const sphere = new Mesh(gl, {geometry: sphereGeometry, program: program2});
+    sphere.position.set(1.3, 0, 0);
+    sphere.setParent(scene);
+
+    const cube = new Mesh(gl, {geometry: cubeGeometry, program: program3});
+    cube.position.set(0, -1.3, 0);
+    cube.setParent(scene);
+
+    const cylinder = new Mesh(gl, {geometry: cylinderGeometry, program: program4});
+    cylinder.position.set(-1.3, 0, 0);
+    cylinder.setParent(scene);
+
+    window.program = program1;
+
+    requestAnimationFrame(update);
+    function update() {
+      requestAnimationFrame(update);
+      controls.update();
+
+      // torus.rotation.y -= 0.02;
+      // sphere.rotation.y -= 0.03;
+      // cube.rotation.y -= 0.04;
+      // cylinder.rotation.y -= 0.02;
+
+      renderer.render({scene, camera});
+    }
+
+    const gui = new dat.GUI();
+    const palette = {
+      light: '#FFFFFF',
+      reflection1: '#0000FF',
+      reflection2: '#FF00FF',
+      reflection3: '#008000',
+      reflection4: '#FF0000',
+    };
+    gui.addColor(palette, 'light').onChange((val) => {
+      const color = new Color(val);
+      program1.uniforms.ambientLight.value = color;
+      program2.uniforms.ambientLight.value = color;
+      program3.uniforms.ambientLight.value = color;
+      program4.uniforms.ambientLight.value = color;
+    });
+    gui.addColor(palette, 'reflection1').onChange((val) => {
+      program1.uniforms.materialReflection.value = new Color(val);
+    });
+    gui.addColor(palette, 'reflection2').onChange((val) => {
+      program2.uniforms.materialReflection.value = new Color(val);
+    });
+    gui.addColor(palette, 'reflection3').onChange((val) => {
+      program3.uniforms.materialReflection.value = new Color(val);
+    });
+    gui.addColor(palette, 'reflection4').onChange((val) => {
+      program4.uniforms.materialReflection.value = new Color(val);
+    });
+  </script>
+</body>
+</html>
