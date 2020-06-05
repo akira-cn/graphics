@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ogl</title>
+</head>
+<body>
+  <canvas width="512" height="512"></canvas>
+  <script type="module">
+    import {Renderer, Camera, Transform, Program, Geometry, Mesh, Orbit, Texture, Polyline, Color, Vec3, Quat} from '../common/lib/ogl/index.mjs';
+    import * as dat from '../common/lib/dat.gui.js';
+
+    const canvas = document.querySelector('canvas');
+    const renderer = new Renderer({
+      canvas,
+      width: 512,
+      height: 512,
+    });
+
+    const gl = renderer.gl;
+    gl.clearColor(1, 1, 1, 1);
+    const camera = new Camera(gl, {fov: 35});
+    camera.position.set(0, 0, 10);
+    camera.lookAt([0, 0, 0]);
+
+    const scene = new Transform();
+
+    const vertex = /* glsl */ `
+      precision highp float;
+
+      attribute vec3 position;
+      attribute vec3 normal;
+      attribute vec2 uv;
+
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+
+      varying vec2 vUv;
+
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `;
+
+    const fragment = /* glsl */ `
+      precision highp float;
+
+      uniform sampler2D tMap;
+      varying vec2 vUv;
+
+      void main() {
+        gl_FragColor = texture2D(tMap, vUv);
+      }
+    `;
+
+    async function loadModel(src) {
+      const data = await (await fetch(src)).json();
+
+      const geometry = new Geometry(gl, {
+        position: {size: 3, data: new Float32Array(data.position)},
+        uv: {size: 2, data: new Float32Array(data.uv)},
+        normal: {size: 3, data: new Float32Array(data.normal)},
+      });
+
+      return geometry;
+    }
+
+    function loadTexture(src) {
+      const texture = new Texture(gl);
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          texture.image = img;
+          resolve(texture);
+        };
+        img.src = src;
+      });
+    }
+
+    const controls = new Orbit(camera);
+
+    (async function () {
+      const geometry = await loadModel('../assets/airplane.json');
+      const texture = await loadTexture('../assets/airplane.jpg');
+
+      const program = new Program(gl, {
+        vertex,
+        fragment,
+        uniforms: {
+          tMap: {value: texture},
+        },
+      });
+      const mesh = new Mesh(gl, {geometry, program});
+      mesh.setParent(scene);
+
+      const points = [
+        new Vec3(0, 0, 0),
+        new Vec3(0, 10, 0),
+      ];
+
+      const axis = new Polyline(gl, {
+        points,
+        uniforms: {
+          uColor: {value: new Color('#f00')},
+          uThickness: {value: 3},
+        },
+      });
+      axis.mesh.setParent(scene);
+      renderer.render({scene, camera});
+
+      const gui = new dat.GUI();
+      const palette = {
+        alpha: 0,
+        x: 0,
+        y: 1,
+        z: 0,
+      };
+
+      function updateAxis() {
+        const {x, y, z} = palette;
+        const v = new Vec3(x, y, z).normalize().scale(10);
+        points[1].copy(v);
+        axis.updateGeometry();
+        renderer.render({scene, camera});
+      }
+
+      function updateQuaternion(val) {
+        const theta = 0.5 * val / 180 * Math.PI;
+        const c = Math.cos(theta);
+        const s = Math.sin(theta);
+        const p = new Vec3().copy(points[1]).normalize();
+        const q = new Quat(p.x * s, p.y * s, p.z * s, c);
+        mesh.quaternion = q;
+        renderer.render({scene, camera});
+      }
+      gui.add(palette, 'x', -10, 10).onChange(updateAxis);
+      gui.add(palette, 'y', -10, 10).onChange(updateAxis);
+      gui.add(palette, 'z', -10, 10).onChange(updateAxis);
+      gui.add(palette, 'alpha', -180, 180).onChange(updateQuaternion);
+
+      requestAnimationFrame(update);
+      function update() {
+        requestAnimationFrame(update);
+        // controls.update();
+        renderer.render({scene, camera});
+      }
+    }());
+  </script>
+</body>
+</html>
