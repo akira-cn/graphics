@@ -194,7 +194,7 @@
         return specularFactor *  pow(eyeCos, shininess);
       }
 
-      vec2 phongReflection(vec3 pos, vec3 normal, vec3 eye) {
+      vec4 phongReflection(vec3 pos, vec3 normal, vec3 eye) {
         float specular = 0.0;
         vec3 diffuse = vec3(0);
         
@@ -243,15 +243,15 @@
           specular += r * getSpecular(dir, normal, eye);
         }
 
-        return vec2(specular, diffuse);
+        return vec4(diffuse, specular);
       }
 
       void main() {
         vec3 eyeDirection = normalize(vCameraPos - vPos);
-        vec2 phong = phongReflection(vPos, vNormal, eyeDirection);
+        vec4 phong = phongReflection(vPos, vNormal, eyeDirection);
 
         // 合成颜色
-        gl_FragColor.rgb = phong.x + (phong.y + ambientLight) * materialReflection;
+        gl_FragColor.rgb = phong.w + (phong.xyz + ambientLight) * materialReflection;
         gl_FragColor.a = 1.0;
       }
     `;
