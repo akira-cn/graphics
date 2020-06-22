@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas性能</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <canvas width="500" height="500"></canvas>
+  <script>
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
+
+    function randomColor() {
+      return `hsl(${Math.random() * 360}, 100%, 50%)`;
+    }
+
+    function drawCircle(context, radius) {
+      const x = Math.random() * WIDTH;
+      const y = Math.random() * HEIGHT;
+      const fillColor = randomColor();
+      context.fillStyle = fillColor;
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    function draw(context, count = 500, radius = 10) {
+      for(let i = 0; i < count; i++) {
+        drawCircle(context, radius);
+      }
+    }
+
+    requestAnimationFrame(function update() {
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      draw(ctx, 3000, 10);
+      requestAnimationFrame(update);
+    });
+  </script>
+</body>
+</html>
