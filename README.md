@@ -76,17 +76,14 @@ https://akira-cn.github.io/graphics/
 
 ## 数据图表-css
 
-- [面积图](https://akira-cn.github.io/graphics/data-graph-css/index.html)
-- [柱状图](https://akira-cn.github.io/graphics/data-graph-css/index.html)
-- [折线图](https://akira-cn.github.io/graphics/data-graph-css/index.html)
-- [饼图](https://akira-cn.github.io/graphics/data-graph-css/index.html)
+- [面积图](https://akira-cn.github.io/graphics/data-graph-css/areagraph.html)
+- [柱状图](https://akira-cn.github.io/graphics/data-graph-css/bargraph.html)
+- [折线图](https://akira-cn.github.io/graphics/data-graph-css/linegraph.html)
+- [饼图](https://akira-cn.github.io/graphics/data-graph-css/piegraph.html)
 
 ## 数据图表里-svg
 
-- [面积图](https://akira-cn.github.io/graphics/data-graph-svg/index.html)
-- [柱状图](https://akira-cn.github.io/graphics/data-graph-svg/index.html)
-- [折线图](https://akira-cn.github.io/graphics/data-graph-svg/index.html)
-- [饼图](https://akira-cn.github.io/graphics/data-graph-svg/index.html)
+- [柱状图](https://akira-cn.github.io/graphics/data-graph-svg/bargraph.html)
 
 ## Github贡献图表
 
