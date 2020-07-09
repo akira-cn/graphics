@@ -62,7 +62,7 @@ const dataSource = 'https://s5.ssl.qhres.com/static/b0695e2dd30daa64.json';
   let activeTarget = null;
   svgroot.addEventListener('mousemove', (evt) => {
     let target = evt.target;
-    if(target.nodeName === 'text') target = target.parentNode;
+    if(target.nodeName === 'text') target = target.previousSibling;
     if(activeTarget !== target) {
       if(activeTarget) activeTarget.setAttribute('fill', 'rgba(0, 0, 0, 0.2)');
     }
