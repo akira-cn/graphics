@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机图形</title>
+  <style>
+    #container canvas {
+      position: absolute;
+    }
+    #bg {
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas width="600" height="600" id="bg"></canvas>
+    <canvas width="600" height="600" id="fg"></canvas>
+  </div>
+  <script>
+    function drawRandomTriangle(path, context) {
+      const {width, height} = context.canvas;
+      context.save();
+      context.translate(Math.random() * width, Math.random() * height);
+      context.fill(path);
+      context.restore();
+    }
+
+    function drawBackground(context, count = 2000) {
+      context.fillStyle = '#ed7';
+      const d = 'M0,0L0,10L8.66, 5z';
+      const p = new Path2D(d);
+      for(let i = 0; i < count; i++) {
+        drawRandomTriangle(p, context);
+      }
+    }
+
+    function loadImage(src) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      return new Promise((resolve) => {
+        img.onload = resolve(img);
+        img.src = src;
+      });
+    }
+
+    async function drawForeground(context) {
+      const img = await loadImage('http://p3.qhimg.com/t015b85b72445154fe0.png');
+      const {width, height} = context.canvas;
+      function update(t) {
+        context.clearRect(0, 0, width, height);
+        context.save();
+        context.translate(0, 0.5 * height);
+        const p = (t % 3000) / 3000;
+        const x = width * p;
+        const y = 0.1 * height * Math.sin(3 * Math.PI * p);
+        context.drawImage(img, x, y);
+        context.restore();
+        requestAnimationFrame(update);
+      }
+      update(0);
+    }
+
+    const bgcanvas = document.querySelector('#bg');
+    const fgcanvas = document.querySelector('#fg');
+    drawBackground(bgcanvas.getContext('2d'));
+    drawForeground(fgcanvas.getContext('2d'));
+  </script>
+</body>
+</html>

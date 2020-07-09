@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机图形</title>
+</head>
+<body>
+  <canvas width="600" height="600"></canvas>
+  <script>
+    const canvas = document.querySelector('canvas');
+
+    const worker = new Worker('./random_shapes_worker.js');
+    const ofc = canvas.transferControlToOffscreen();
+    worker.postMessage({
+      canvas: ofc,
+      type: 'init',
+    }, [ofc]);
+  </script>
+</body>
+</html>
