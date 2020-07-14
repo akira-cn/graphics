@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机三角形</title>
+  <script src="../common/lib/gl-renderer.js"></script>
+</head>
+<body>
+  <canvas width="600" height="600"></canvas>
+  <script>
+    const canvas = document.querySelector('canvas');
+    const renderer = new GlRenderer(canvas);
+
+    const vertex = `
+      attribute vec2 a_vertexPosition;
+      
+      void main() {
+        gl_Position = vec4(a_vertexPosition, 1, 1);
+      }
+    `;
+
+    const fragment = `
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      uniform vec4 u_color;
+      
+      void main() {
+        gl_FragColor = u_color;
+      }
+    `;
+
+    const program = renderer.compileSync(fragment, vertex);
+    renderer.useProgram(program);
+
+    function randomTriangle(x = 0, y = 0, rotation = 0.0, radius = 0.1) {
+      const a = rotation,
+        b = a + 2 * Math.PI / 3,
+        c = a + 4 * Math.PI / 3;
+
+      return [
+        [x + radius * Math.sin(a), y + radius * Math.cos(a)],
+        [x + radius * Math.sin(b), y + radius * Math.cos(b)],
+        [x + radius * Math.sin(c), y + radius * Math.cos(c)],
+      ];
+    }
+
+    const COUNT = 3000;
+    function render() {
+      for(let i = 0; i < COUNT; i++) {
+        const x = 2 * Math.random() - 1;
+        const y = 2 * Math.random() - 1;
+        const rotation = 2 * Math.PI * Math.random();
+
+        renderer.uniforms.u_color = [
+          Math.random(),
+          Math.random(),
+          Math.random(),
+          1];
+
+        const positions = randomTriangle(x, y, rotation);
+        renderer.setMeshData([{
+          positions,
+        }]);
+
+        renderer._draw();
+      }
+      requestAnimationFrame(render);
+    }
+
+    render();
+  </script>
+</body>
+</html>

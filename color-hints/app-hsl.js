@@ -1,4 +1,4 @@
-import {Vec3} from '../common/lib/math/vec3.js';
+import {Vec3} from '../common/lib/math/Vec3.js';
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>随机三角形</title>
+  <script src="../common/lib/gl-renderer.js"></script>
+</head>
+<body>
+  <canvas width="600" height="600"></canvas>
+  <script>
+    const canvas = document.querySelector('canvas');
+    const renderer = new GlRenderer(canvas);
+
+    const vertex = `
+      attribute vec2 a_vertexPosition;
+      attribute float id;
+
+      uniform float uTime;
+  
+      highp float random(vec2 co) {
+        highp float a = 12.9898;
+        highp float b = 78.233;
+        highp float c = 43758.5453;
+        highp float dt= dot(co.xy ,vec2(a,b));
+        highp float sn= mod(dt,3.14);
+        return fract(sin(sn) * c);
+      }
+
+      varying vec3 vColor;
+
+      void main() {
+        float alpha = 6.28 * random(vec2(uTime, 200000.0 + id));
+        float c = cos(alpha);
+        float s = sin(alpha);
+
+        mat3 viewMatrix = mat3(
+          c, -s, 0,
+          s, c, 0,
+          2.0 * random(vec2(uTime, id)) - 1.0, 2.0 * random(vec2(uTime, 100000.0 + id)) - 1.0, 1
+        );
+        vec3 pos = viewMatrix * vec3(a_vertexPosition, 1);
+        vColor = vec3(
+          random(vec2(uTime, 400000.0 + id)),
+          random(vec2(uTime, 500000.0 + id)),
+          random(vec2(uTime, 600000.0 + id))
+        );
+        gl_Position = vec4(pos, 1);
+      }
+    `;
+
+    const fragment = `
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
+      varying vec3 vColor;
+      
+      void main() {
+        gl_FragColor.rgb = vColor;
+        gl_FragColor.a = 1.0;
+      }
+    `;
+
+    const program = renderer.compileSync(fragment, vertex);
+    renderer.useProgram(program);
+
+    const alpha = 2 * Math.PI / 3;
+    const beta = 2 * alpha;
+    
+    const COUNT = 6000;
+    renderer.setMeshData({
+      positions: [
+        [0, 0.1],
+        [0.1 * Math.sin(alpha), 0.1 * Math.cos(alpha)],
+        [0.1 * Math.sin(beta), 0.1 * Math.cos(beta)],
+      ],
+      instanceCount: COUNT,
+      attributes: {
+        id: {data: [...new Array(COUNT).keys()], divisor: 1},
+      },
+    });
+
+    function render(t) {
+      renderer.uniforms.uTime = t;
+      renderer.render();
+      requestAnimationFrame(render);
+    }
+
+    render(0);
+  </script>
+</body>
+</html>
