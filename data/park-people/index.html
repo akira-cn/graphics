@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公园里的人群</title>
+  <style>
+    #main {
+      width: 500px;
+      height: 500px;
+      position: absolute;
+    }
+
+    #main > * {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .landmark {
+      position: absolute;
+      border-radius: 50%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="main">
+    <div>
+      <div class="landmark" style="line-height:200px;width:200px;height:200px;background:#ff0a;">广场</div>
+      <div class="landmark" style="left:260px;line-height:200px;width:200px;height:200px;background:#f0fa;">休闲区</div>
+      <div class="landmark" style="top:260px;line-height:200px;width:200px;height:200px;background:#00fa;">游乐场</div>
+      <div class="landmark" style="top:260px;left:260px;line-height:200px;width:200px;height:200px;background:#0f0a;">花园</div>
+    </div>
+    <canvas width="600" height="600"></canvas>
+  </div>
+  <script>
+    const canvas = document.querySelector('canvas');
+    const {width, height} = canvas;
+    const data = [];
+
+    function randomData(count = 500) {
+      for(let i = 0; i < count; i++) {
+        const x = Math.floor(Math.random() * width);
+        const y = Math.floor(Math.random() * width);
+        const r = Math.random();
+        const r2 = Math.random();
+        let time;
+        let gender = 'f';
+        if(x < 300 && y < 300) { // 在广场
+          if(r > 0.9) time = 8;
+          else if(r > 0.8) time = 12;
+          else if(r > 0.6) time = 18;
+          else time = 20;
+          if(r > 0.5) gender = 'm';
+        }
+        if(x >= 300 && y < 300) { // 在休闲区
+          if(r > 0.7) time = 8;
+          else if(r > 0.4) time = 12;
+          else if(r > 0.1) time = 18;
+          else time = 20;
+          if(r > 0.3) gender = 'm';
+        }
+        if(x < 300 && y >= 300) { // 在游乐场
+          if(r > 0.98) time = 8;
+          else if(r > 0.4) time = 12;
+          else if(r > 0.05) time = 18;
+          else time = 20;
+          if(r > 0.5) gender = 'm';
+        }
+        else {
+          if(r > 0.6) time = 8;
+          else if(r > 0.4) time = 12;
+          else if(r > 0.05) time = 18;
+          else time = 20;
+          if(r > 0.7) gender = 'm';
+        }
+        data.push({x, y, time, gender});
+      }
+    }
+
+    function draw() {
+      const context = canvas.getContext('2d');
+      context.fillStyle = 'rgba(255, 0, 0, 0.5)';
+      for(let i = 0; i < data.length; i++) {
+        const {x, y} = data[i];
+        context.beginPath();
+        const spot = context.arc(x, y, 10, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+
+    randomData();
+
+    console.log(JSON.stringify(data));
+
+    draw();
+  </script>
+</body>
+</html>
