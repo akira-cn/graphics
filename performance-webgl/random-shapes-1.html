@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>随机三角形</title>
+  <title>随机多边形</title>
   <script src="../common/lib/gl-renderer.js"></script>
 </head>
 <body>
@@ -14,12 +14,9 @@
 
     const vertex = `
       attribute vec2 a_vertexPosition;
-
-      uniform mat3 modelMatrix;
       
       void main() {
-        vec3 pos = modelMatrix * vec3(a_vertexPosition, 1);
-        gl_Position = vec4(pos, 1);
+        gl_Position = vec4(a_vertexPosition, 1, 1);
       }
     `;
 
@@ -34,20 +31,23 @@
         gl_FragColor = u_color;
       }
     `;
-
     const program = renderer.compileSync(fragment, vertex);
     renderer.useProgram(program);
 
-    const alpha = 2 * Math.PI / 3;
-    const beta = 2 * alpha;
-
-    renderer.setMeshData({
-      positions: [
-        [0, 0.1],
-        [0.1 * Math.sin(alpha), 0.1 * Math.cos(alpha)],
-        [0.1 * Math.sin(beta), 0.1 * Math.cos(beta)],
-      ],
-    });
+    function randomShape(x = 0, y = 0, edges = 3, rotation = 0.0, radius = 0.1) {
+      const a0 = rotation;
+      const delta = 2 * Math.PI / edges;
+      const positions = [];
+      const cells = [];
+      for(let i = 0; i < edges; i++) {
+        const angle = a0 + i * delta;
+        positions.push([x + radius * Math.sin(angle), y + radius * Math.cos(angle)]);
+        if(i > 0 && i < edges - 1) {
+          cells.push([0, i, i + 1]);
+        }
+      }
+      return {positions, cells};
+    }
 
     const COUNT = 3000;
     function render() {
@@ -56,17 +56,17 @@
         const y = 2 * Math.random() - 1;
         const rotation = 2 * Math.PI * Math.random();
 
-        renderer.uniforms.modelMatrix = [
-          Math.cos(rotation), -Math.sin(rotation), 0,
-          Math.sin(rotation), Math.cos(rotation), 0,
-          x, y, 1,
-        ];
-
         renderer.uniforms.u_color = [
           Math.random(),
           Math.random(),
           Math.random(),
           1];
+
+        const {positions, cells} = randomShape(x, y, 3 + Math.floor(4 * Math.random()), rotation);
+        renderer.setMeshData([{
+          positions,
+          cells,
+        }]);
 
         renderer._draw();
       }

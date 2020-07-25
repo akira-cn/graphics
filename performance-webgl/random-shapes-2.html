@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>随机三角形</title>
+  <title>随机多边形</title>
   <script src="../common/lib/gl-renderer.js"></script>
 </head>
 <body>
@@ -13,8 +13,7 @@
     const renderer = new GlRenderer(canvas);
 
     const vertex = `
-      attribute vec2 a_vertexPosition;
-      attribute float id;
+      attribute vec3 a_vertexPosition;
 
       uniform float uTime;
   
@@ -30,6 +29,9 @@
       varying vec3 vColor;
 
       void main() {
+        vec2 pos = a_vertexPosition.xy;
+        float id = a_vertexPosition.z;
+
         float alpha = 6.28 * random(vec2(uTime, 200000.0 + id));
         float c = cos(alpha);
         float s = sin(alpha);
@@ -39,13 +41,12 @@
           s, c, 0,
           2.0 * random(vec2(uTime, id)) - 1.0, 2.0 * random(vec2(uTime, 100000.0 + id)) - 1.0, 1
         );
-        vec3 pos = modelMatrix * vec3(a_vertexPosition, 1);
         vColor = vec3(
           random(vec2(uTime, 400000.0 + id)),
           random(vec2(uTime, 500000.0 + id)),
           random(vec2(uTime, 600000.0 + id))
         );
-        gl_Position = vec4(pos, 1);
+        gl_Position = vec4(modelMatrix * vec3(pos, 1), 1);
       }
     `;
 
@@ -65,21 +66,40 @@
     const program = renderer.compileSync(fragment, vertex);
     renderer.useProgram(program);
 
-    const alpha = 2 * Math.PI / 3;
-    const beta = 2 * alpha;
-    
-    const COUNT = 6000;
-    renderer.setMeshData({
-      positions: [
-        [0, 0.1],
-        [0.1 * Math.sin(alpha), 0.1 * Math.cos(alpha)],
-        [0.1 * Math.sin(beta), 0.1 * Math.cos(beta)],
-      ],
-      instanceCount: COUNT,
-      attributes: {
-        id: {data: [...new Array(COUNT).keys()], divisor: 1},
-      },
-    });
+    const COUNT = 3000;
+
+    function createShapes(count) {
+      const positions = new Float32Array(count * 6 * 3); // 最多6边形
+      const cells = new Int16Array(count * 4 * 3); // 索引数等于3倍顶点数-2
+      positions.fill(0);
+      cells.fill(0);
+
+      let offset = 0;
+      let cellsOffset = 0;
+      for(let i = 0; i < count; i++) {
+        const edges = 3 + Math.floor(4 * Math.random());
+
+        const delta = 2 * Math.PI / edges;
+
+        for(let j = 0; j < edges; j++) {
+          const angle = j * delta;
+          positions.set([0.1 * Math.sin(angle), 0.1 * Math.cos(angle), i], (offset + j) * 3);
+          if(j > 0 && j < edges - 1) {
+            cells.set([offset, offset + j, offset + j + 1], cellsOffset);
+            cellsOffset += 3;
+          }
+        }
+        offset += edges;
+      }
+      return {positions, cells};
+    }
+
+    const {positions, cells} = createShapes(COUNT);
+
+    renderer.setMeshData([{
+      positions,
+      cells,
+    }]);
 
     function render(t) {
       renderer.uniforms.uTime = t;
