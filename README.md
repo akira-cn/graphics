@@ -2,20 +2,20 @@
 
 https://akira-cn.github.io/graphics/
 
-## 3D 基础
+## 3D基础
 
 - [立方体](https://akira-cn.github.io/graphics/3d-basic/cube.html)
 - [圆柱](https://akira-cn.github.io/graphics/3d-basic/cylinder.html)
 
-## 3D 相机
+## 3D相机
 
 - [圆柱裁切](https://akira-cn.github.io/graphics/3d-camera/cylinder-clip.html)
 - [正交相机](https://akira-cn.github.io/graphics/3d-camera/cylinder-ortho.html)
 - [透视相机](https://akira-cn.github.io/graphics/3d-camera/cylinder-perspective.html)
 - [圆柱](https://akira-cn.github.io/graphics/3d-camera/cylinder.html)
-- [使用 Ogl](https://akira-cn.github.io/graphics/3d-camera/ogl-basic.html)
+- [使用Ogl](https://akira-cn.github.io/graphics/3d-camera/ogl-basic.html)
 
-## 3D 模型矩阵
+## 3D模型矩阵
 
 - [轴角](https://akira-cn.github.io/graphics/3d-model/axis-angle.html)
 - [欧拉角](https://akira-cn.github.io/graphics/3d-model/euler-angle.html)
@@ -26,28 +26,28 @@ https://akira-cn.github.io/graphics/
 - [时间动画](https://akira-cn.github.io/graphics/animate/animate_time.html)
 - [动画封装](https://akira-cn.github.io/graphics/animate/animator.html)
 - [帧动画](https://akira-cn.github.io/graphics/animate/frame_animate.html)
-- [css 贝塞尔](https://akira-cn.github.io/graphics/animate/lerp-bezier-css.html)
-- [js 贝塞尔](https://akira-cn.github.io/graphics/animate/lerp-bezier.html)
+- [css贝塞尔](https://akira-cn.github.io/graphics/animate/lerp-bezier-css.html)
+- [js贝塞尔](https://akira-cn.github.io/graphics/animate/lerp-bezier.html)
 
-## webgl 动画
+## webgl动画
 
 - [bezier easing](https://akira-cn.github.io/graphics/animate_webgl/bezier_easing.html)
 - [网格动画](https://akira-cn.github.io/graphics/animate_webgl/cellular-animation.html)
 - [片元着色器旋转](https://akira-cn.github.io/graphics/animate_webgl/fragment_rotation_animation.html)
 - [片元着色器旋转](https://akira-cn.github.io/graphics/animate_webgl/fragment_rotation_animation2.html)
 - [帧动画](https://akira-cn.github.io/graphics/animate_webgl/fragment_animate.html)
-- [补间 easing](https://akira-cn.github.io/graphics/animate_webgl/lerp_easing.html)
+- [补间easing](https://akira-cn.github.io/graphics/animate_webgl/lerp_easing.html)
 - [补间动画](https://akira-cn.github.io/graphics/animate_webgl/lerp.html)
 - [粒子动画](https://akira-cn.github.io/graphics/animate_webgl/particle.html)
 - [顶点移动动画](https://akira-cn.github.io/graphics/animate_webgl/vertex_move_animator.html)
-- [顶点移动 easing](https://akira-cn.github.io/graphics/animate_webgl/vertex_move_easing.html)
+- [顶点移动easing](https://akira-cn.github.io/graphics/animate_webgl/vertex_move_easing.html)
 - [顶点旋转动画](https://akira-cn.github.io/graphics/animate_webgl/vertex_rotation_animator.html)
 - [顶点旋转](https://akira-cn.github.io/graphics/animate_webgl/vertex_rotation.html)
 
 ## 贝塞尔
 
-- [3 阶贝塞尔曲线](https://akira-cn.github.io/graphics/bezier/cubic.html)
-- [2 阶贝塞尔曲线](https://akira-cn.github.io/graphics/bezier/quadratic.html)
+- [3阶贝塞尔曲线](https://akira-cn.github.io/graphics/bezier/cubic.html)
+- [2阶贝塞尔曲线](https://akira-cn.github.io/graphics/bezier/quadratic.html)
 
 ## canvas
 
@@ -85,19 +85,19 @@ https://akira-cn.github.io/graphics/
 
 - [柱状图](https://akira-cn.github.io/graphics/data-graph-svg/bargraph.html)
 
-## Github 贡献图表
+## Github贡献图表
 
-- [3D 柱状图](https://akira-cn.github.io/graphics/github-contributions/index.html)
+- [3D柱状图](https://akira-cn.github.io/graphics/github-contributions/index.html)
 
-## GPU 抽奖
+## GPU抽奖
 
-- [webgl 抽奖](https://akira-cn.github.io/graphics/gl-graffle/index.html)
+- [webgl抽奖](https://akira-cn.github.io/graphics/gl-graffle/index.html)
 
 ## 光照
 
 - [环境光](https://akira-cn.github.io/graphics/lights/ambient-light.html)
 - [平行光](https://akira-cn.github.io/graphics/lights/directional-light.html)
-- [Phong 光照](https://akira-cn.github.io/graphics/lights/phong.html)
+- [Phong光照](https://akira-cn.github.io/graphics/lights/phong.html)
 - [点光源](https://akira-cn.github.io/graphics/lights/point-light.html)
 - [镜面高光](https://akira-cn.github.io/graphics/lights/specular.html)
 - [聚光灯](https://akira-cn.github.io/graphics/lights/spot-light.html)
@@ -150,23 +150,23 @@ https://akira-cn.github.io/graphics/
 - [圆](https://akira-cn.github.io/graphics/polar-shader/circle.html)
 - [葫芦](https://akira-cn.github.io/graphics/polar-shader/clover.html)
 - [径向](https://akira-cn.github.io/graphics/polar-shader/conic.html)
-- [hsv 色轮](https://akira-cn.github.io/graphics/polar-shader/hsvwheel.html)
+- [hsv色轮](https://akira-cn.github.io/graphics/polar-shader/hsvwheel.html)
 - [玫瑰瓣](https://akira-cn.github.io/graphics/polar-shader/rose.html)
-- [玫瑰瓣 2](https://akira-cn.github.io/graphics/polar-shader/rose2.html)
+- [玫瑰瓣2](https://akira-cn.github.io/graphics/polar-shader/rose2.html)
 
 ## 多边形填充
 
-- [2D 多边形填充](https://akira-cn.github.io/graphics/polygon-fill/fill-canvas2d.html)
+- [2D多边形填充](https://akira-cn.github.io/graphics/polygon-fill/fill-canvas2d.html)
 
 ## 多边形-曲线
 
-- [2D 曲线](https://akira-cn.github.io/graphics/polygon-curve/canvas2d.html)
+- [2D曲线](https://akira-cn.github.io/graphics/polygon-curve/canvas2d.html)
 - [挤压曲线](https://akira-cn.github.io/graphics/polygon-curve/webgl-lines-extrude.html)
 
 ## 重复与随机
 
 - [网格](https://akira-cn.github.io/graphics/repeat-and-random/grids.html)
-- [Mandelbrot 集](https://akira-cn.github.io/graphics/repeat-and-random/grids.html)
+- [Mandelbrot集](https://akira-cn.github.io/graphics/repeat-and-random/grids.html)
 - [迷宫](https://akira-cn.github.io/graphics/repeat-and-random/maze.html)
 - [随机一](https://akira-cn.github.io/graphics/repeat-and-random/random.html)
 - [随机二](https://akira-cn.github.io/graphics/repeat-and-random/random2.html)
@@ -192,8 +192,8 @@ https://akira-cn.github.io/graphics/
 
 ## 三角剖分
 
-- [多边形 2D-碰撞检测](https://akira-cn.github.io/graphics/triangluations/polygon2d-collision.html)
-- [多边形 2D](https://akira-cn.github.io/graphics/triangluations/polygon2d.html)
+- [多边形2D-碰撞检测](https://akira-cn.github.io/graphics/triangluations/polygon2d-collision.html)
+- [多边形2D](https://akira-cn.github.io/graphics/triangluations/polygon2d.html)
 - [多边形-三角剖分](https://akira-cn.github.io/graphics/triangluations/trianglu-polygon.html)
 
 ## 矢量绘制
@@ -204,10 +204,10 @@ https://akira-cn.github.io/graphics/
 
 - [矢量画树](https://akira-cn.github.io/graphics/vector_tree/index.html)
 
-## WegGL 基础
+## WegGL基础
 
 - [Hello world](https://akira-cn.github.io/graphics/webgl/hello_world.html)
 
-## WebGL 粒子
+## WebGL粒子
 
 - [粒子效果](https://akira-cn.github.io/graphics/webgl_particles/index.html)
