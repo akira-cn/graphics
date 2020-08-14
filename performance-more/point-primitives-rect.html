@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spots</title>
+  <script src="../common/lib/gl-renderer.js"></script>
+</head>
+<body>
+  <canvas width="600" height="600"></canvas>
+  <script>
+    const canvas = document.querySelector('canvas');
+    const renderer = new GlRenderer(canvas);
+
+    const vertex = `
+      attribute vec2 a_vertexPosition;
+
+      uniform vec2 uResolution;
+  
+      void main() {
+        gl_PointSize = 0.2 * uResolution.x;
+        gl_Position = vec4(a_vertexPosition, 1, 1);
+      }
+    `;
+
+    const fragment = `
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+      
+      void main() {
+        gl_FragColor = vec4(0, 0, 1, 1);
+      }
+    `;
+    const program = renderer.compileSync(fragment, vertex);
+    renderer.useProgram(program);
+
+    renderer.uniforms.uResolution = [canvas.width, canvas.height];
+    renderer.setMeshData({
+      mode: renderer.gl.POINTS,
+      positions: [[0, 0]],
+    });
+
+    renderer.render();
+  </script>
+</body>
+</html>

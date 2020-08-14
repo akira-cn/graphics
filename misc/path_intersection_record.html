@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Path相交</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+    }
+    canvas {
+      background: #eee;
+    }
+  </style>
+</head>
+<body>
+  <canvas width="600" height="600"></canvas>
+  <div id="videoContainer">
+    <h2>视频</h2>
+    <video
+      width="300"
+      height="300"
+      controls="true"
+      autoplay="true"
+      id="video"
+    ></video>
+  </div>
+  <script type="module">
+    import {subtract, cross} from '../common/lib/math/functions/Vec2Func.js';
+
+    function isCross(p1, p2, p3, p4) {
+      const v1 = subtract([], p4, p3);
+      const v2 = subtract([], p1, p3);
+      const v3 = subtract([], p2, p3);
+
+      const z1 = cross(v1, v2);
+      const z2 = cross(v1, v3);
+
+      return z1 * z2 <= 0;
+    }
+
+    function isPathIntersection(points) {
+      const len = points.length;
+
+      for(let i = 0; i < len - 1; i++) {
+        const point = points[i];
+        const nextPoint = points[i + 1];
+
+        for(let j = 0; j < len - 1; j++) {
+          const p1 = points[j],
+            p2 = points[j + 1];
+
+          if(p1 !== point && p2 !== point && p1 !== nextPoint && p2 !== nextPoint
+            && isCross(p1, p2, point, nextPoint) && isCross(point, nextPoint, p1, p2)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function draw(context, points) {
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+      const d = `M${points.join('L')}`;
+      const color = isPathIntersection(points) ? 'red' : 'blue';
+      context.strokeStyle = color;
+      const path = new Path2D(d);
+      context.stroke(path);
+    }
+
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    const points = [];
+    const data = [];
+
+    canvas.addEventListener('click', (evt) => {
+      const {x, y} = evt;
+      const {x: x0, y: y0} = evt.target.getBoundingClientRect();
+      points.push([x - x0, y - y0]);
+      // draw(ctx, points);
+      if(recorder.state !== 'recording') {
+        data.length = 0;
+        recorder.start();
+      }
+      // console.log(recorder);
+    });
+
+    canvas.addEventListener('dblclick', (evt) => {
+      points.length = 0;
+      // draw(ctx, points);
+      if(recorder.state === 'recording') {
+        recorder.stop();
+      }
+    });
+
+    function update() {
+      draw(ctx, points);
+      requestAnimationFrame(update);
+    }
+    update();
+
+    const stream = canvas.captureStream();
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    recorder.ondataavailable = function (event) {
+      if (event.data && event.data.size) {
+        data.push(event.data);
+      }
+    };
+    recorder.onstop = () => {
+      const url = URL.createObjectURL(new Blob(data, { type: 'video/webm' }));
+      document.querySelector("#videoContainer").style.display = "block";
+      document.querySelector("video").src = url;
+    };
+  </script>
+</body>
+</html>

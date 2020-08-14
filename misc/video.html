@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>canvas2video demo</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      #container {
+        width: 300px;
+        height: 300px;
+      }
+    </style>
+    <script src="https://unpkg.com/spritejs@3.4.24/dist/spritejs.min.js"></script>
+  </head>
+  <body>
+    <div style="width: 300px; margin: auto;">
+      <h1>canvas2video(webm)</h1>
+      <div id="container"></div>
+      <div id="videoContainer" style="display: none;">
+        <h2>视频</h2>
+        <video
+          width="300"
+          height="300"
+          controls="true"
+          autoplay="true"
+          id="video"
+        ></video>
+      </div>
+    </div>
+    <script src="https://unpkg.com/canvas2video/dist/canvas2video.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg/dist/ffmpeg.min.js"></script>
+    <script>
+      const { Scene, Label, Group } = spritejs;
+      const container = document.getElementById("container");
+      const scene = new Scene({
+        container,
+        width: 300,
+        height: 300,
+      });
+
+      const fglayer = scene.layer("fglayer", {
+        bgcolor: 'red'
+      });
+      // fglayer.canvas.style.backgroundColor = "#3f097a";
+
+      const group = new Group();
+      group.attr({
+        pos: [150, 150],
+      });
+
+      fglayer.append(group);
+
+      const text1 = new Label("Hello World !");
+
+      text1.attr({
+        anchor: [0.5, 0.5],
+        font: "bold 24px Arial",
+        fillColor: "#ffdc45",
+      });
+
+      const text2 = new Label("SpriteJS.org");
+      text2.attr({
+        anchor: [0.5, 0.5],
+        y: 60,
+        font: "bold 24px Arial",
+        fillColor: "#ffdc45",
+      });
+
+      group.animate(
+        [
+          { scale: 1.5, rotate: -30 },
+          { scale: 1, rotate: 0 },
+          { scale: 1.5, rotate: 30 },
+        ],
+        {
+          duration: 3000,
+          iterations: Infinity,
+          direction: "alternate",
+        }
+      );
+
+      group.append(text1, text2);
+    </script>
+    <script>
+      const canvas2videoInstance = new Canvas2Video({
+        canvas: document.querySelector("canvas"),
+        outVideoType: "webm",
+      });
+      canvas2videoInstance.startRecord();
+
+      setTimeout(() => {
+        canvas2videoInstance.stopRecord();
+      }, 3000);
+      canvas2videoInstance
+        .getStreamURL()
+        .then((url) => {
+          console.log("url", url);
+          document.querySelector("#videoContainer").style.display = "block";
+          document.querySelector("video").src = url;
+        })
+        .catch((err) => console.error(err));
+    </script>
+  </body>
+</html>

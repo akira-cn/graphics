@@ -30,21 +30,21 @@
 
       void main() {
         vec2 pos = a_vertexPosition.xy;
-        float id = a_vertexPosition.z;
+        float t = a_vertexPosition.z / 10000.0;
 
-        float alpha = 6.28 * random(vec2(uTime, 200000.0 + id));
+        float alpha = 6.28 * random(vec2(uTime, 2.0 + t));
         float c = cos(alpha);
         float s = sin(alpha);
 
         mat3 modelMatrix = mat3(
           c, -s, 0,
           s, c, 0,
-          2.0 * random(vec2(uTime, id)) - 1.0, 2.0 * random(vec2(uTime, 100000.0 + id)) - 1.0, 1
+          2.0 * random(vec2(uTime, t)) - 1.0, 2.0 * random(vec2(uTime, 1.0 + t)) - 1.0, 1
         );
         vColor = vec3(
-          random(vec2(uTime, 400000.0 + id)),
-          random(vec2(uTime, 500000.0 + id)),
-          random(vec2(uTime, 600000.0 + id))
+          random(vec2(uTime, 4.0 + t)),
+          random(vec2(uTime, 5.0 + t)),
+          random(vec2(uTime, 6.0 + t))
         );
         gl_Position = vec4(modelMatrix * vec3(pos, 1), 1);
       }
@@ -102,7 +102,7 @@
     }]);
 
     function render(t) {
-      renderer.uniforms.uTime = t;
+      renderer.uniforms.uTime = t / 1e6;
       renderer.render();
       requestAnimationFrame(render);
     }
