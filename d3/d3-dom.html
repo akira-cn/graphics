@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    body > div {
+      position: absolute;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <script src="//lib.baomitu.com/d3/4.10.2/d3.js"></script>
+  <script>
+    const dataset = [125, 121, 127, 193, 309];
+    const colors = ['#fe645b', '#feb050', '#c2af87', '#81b848', '#55abf8'];
+
+    const chart = d3.select('body')
+      .selectAll('div')
+      .data(dataset)
+      .enter()
+      .append('div')
+      .style('left', '450px')
+      .style('top', (d, i) => {
+        return `${200 + i * 45}px`;
+      })
+      .style('width', d => `${d}px`)
+      .style('height', '40px')
+      .style('background', (d, i) => colors[i]);
+  </script>
+</body>
+</html>
