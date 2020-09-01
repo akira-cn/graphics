@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人群-时间-性别</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    #container {
+      width: 600px;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://d3js.org/d3.v6.js"></script>
+  <script src="spritejs.js"></script>
+  <div id="container"></div>
+  <script>
+    const  {Scene, Sprite, Polyline, SpriteSvg} = spritejs;
+    (async function() {
+      const data = await (await fetch('data.json')).json();
+      const dataset = d3.rollups(data, v => v.length, d => d.time).sort(([a],[b]) => a - b);
+      dataset.unshift([6, 0]);
+      dataset.push([22, 0]);
+
+      console.log(dataset);
+      const scene = new Scene({
+        container,
+        width: 600,
+        height: 600,
+        displayRatio: 2,
+      });
+      const fglayer = scene.layer('fglayer');
+
+      const points = [];
+      dataset.forEach((d, i) => {
+        const x = 20 + 20 * d[0];
+        const y = 300 - d[1];
+        points.push(x, y);
+      });
+
+      const p = new Polyline();
+      p.attr({
+        points,
+        lineWidth: 4,
+        strokeColor: 'green',
+        smooth: true,
+      });
+
+      fglayer.append(p);
+      
+      const scale = d3.scaleLinear()
+        .domain([0, 24])
+        .range([0, 480]);
+  
+      const axis = d3.axisBottom(scale)
+        .tickValues(dataset.map(d => d[0]));
+
+      const axisNode = new SpriteSvg({
+        x: 20,
+        y: 300,
+        flexible: true,
+      });
+
+      d3.select(axisNode.svg)
+        .attr('width', 600)
+        .attr('height', 60)
+        .append('g')
+        .call(axis);
+
+      axisNode.svg.children[0].setAttribute('font-size', 20);
+      fglayer.append(axisNode);
+    }());
+  </script>
+</body>
+</html>
