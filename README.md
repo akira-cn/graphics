@@ -63,12 +63,12 @@ https://akira-cn.github.io/graphics/
 - [color-hsl-problem](https://akira-cn.github.io/graphics/color-hints/color-hsl-problem.html)
 - [color-lab](https://akira-cn.github.io/graphics/color-hints/color-lab.html)
 
-## convid 可视化
+## covid 可视化
 
-- [convid-动态](https://akira-cn.github.io/graphics/convid-vis/convid-dynamic.html)
-- [convid-静态](https://akira-cn.github.io/graphics/convid-vis/convid-static.html)
-- [墨卡托-topojson](https://akira-cn.github.io/graphics/convid-vis/mercator-topojson.html)
-- [墨卡托](https://akira-cn.github.io/graphics/convid-vis/mercator.html)
+- [covid-动态](https://akira-cn.github.io/graphics/covid-vis/covid-dynamic.html)
+- [covid-静态](https://akira-cn.github.io/graphics/covid-vis/covid-static.html)
+- [墨卡托-topojson](https://akira-cn.github.io/graphics/covid-vis/mercator-topojson.html)
+- [墨卡托](https://akira-cn.github.io/graphics/covid-vis/mercator.html)
 
 ## 坐标系
 
