@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天气 2014</title>
+</head>
+<body>
+  <div id="app" style="width:1200px;height:600px;"></div>
+  <script src="https://d3js.org/d3.v6.js"></script>
+  <script src="https://unpkg.com/spritejs/dist/spritejs.min.js"></script>
+  <script src="https://unpkg.com/@qcharts/core@1.0.16/dist/index.js"></script>
+  <script>
+    (async function() {
+      const rawData = await (await fetch('beijing_2014.csv')).text();
+      const data = d3.csvParse(rawData);
+      console.log(data);
+      const dataset = data
+        .map(d => {
+          return {
+            temperature: Number(d['Temperature(Celsius)(avg)']),
+            humdity: Number(d['Humidity(%)(avg)']),
+            category: '平均气温与湿度'}
+          });
+
+      const { Chart, Scatter, Legend, Tooltip, Axis } = qcharts;
+      const chart = new Chart({
+        container: '#app'
+      });
+      let clientRect={bottom:50};
+      chart.source(dataset, {
+        row: 'category',
+        value: 'temperature',
+        text: 'humdity'
+      });
+
+      const scatter = new Scatter({
+        clientRect,
+        showGuideLine: true,
+      });
+      const toolTip = new Tooltip({
+        title: (data) => '温度与湿度：',
+        formatter: (data) => {
+          return `温度：${data.temperature}C  湿度：${data.humdity}% `
+        }
+      });
+      const legend = new Legend();
+      const axisLeft = new Axis({ orient: 'left',clientRect }).style('axis', false).style('scale', false);
+      const axisBottom = new Axis();
+
+      chart.append([scatter, axisBottom, axisLeft, toolTip, legend]);
+    }());
+  </script>
+</body>
+</html>

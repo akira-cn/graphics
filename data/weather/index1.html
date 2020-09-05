@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天气 2014</title>
+</head>
+<body>
+  <div id="app" style="width:1200px;height:600px;"></div>
+  <script src="https://d3js.org/d3.v6.js"></script>
+  <script src="https://unpkg.com/spritejs/dist/spritejs.min.js"></script>
+  <script src="https://unpkg.com/@qcharts/core/dist/index.js"></script>
+  <script>
+    (async function() {
+      const rawData = await (await fetch('beijing_2014.csv')).text();
+      const data = d3.csvParse(rawData);
+      const dataset = data.filter(d => new Date(d.Date).getMonth() < 3)
+        .map(d => {return {temperature: Number(d['Temperature(Celsius)(avg)']), date: d.Date, category: '平均气温'}})
+      console.log(dataset);
+
+      const { Chart, Line, Legend, Tooltip, Axis } = qcharts;
+      const chart = new Chart({
+        container: '#app'
+      });
+      let clientRect={bottom:50};
+      chart.source(dataset, {
+        row: 'category',
+        value: 'temperature',
+        text: 'date'
+      });
+
+      const line = new Line({clientRect});
+      const axisBottom = new Axis({clientRect}).style('grid', false);
+      axisBottom.attr('formatter', d => '');
+      const toolTip = new Tooltip({
+        title: arr => {
+          return '平均气温'
+        }
+      });
+      const legend = new Legend();
+      const axisLeft = new Axis({ orient: 'left',clientRect }).style('axis', false).style('scale', false);
+
+      chart.append([line, axisBottom, axisLeft, toolTip, legend]);
+    }());
+  </script>
+</body>
+</html>
