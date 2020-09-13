@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>天气 2014</title>
+  </head>
+  <body>
+    <div id="app" style="width: 1200px; height: 600px"></div>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="https://unpkg.com/spritejs/dist/spritejs.min.js"></script>
+    <script src="https://unpkg.com/@qcharts/core@1.0.25/dist/index.js"></script>
+    <script>
+      ;(async function () {
+        const rawData = await (await fetch('beijing_2014.csv')).text()
+        const data = d3.csvParse(rawData)
+        const dataset = data
+          .map(d => {
+            return {
+              temperature: Number(d['Temperature(Celsius)(avg)']),
+              tdp: Number(d['Dew Point(Celsius)(avg)']),
+              category: '平均气温与露点'
+            }
+          })
+          .sort((a, b) => a.tdp - b.tdp)
+
+        console.log(dataset)
+
+        let dataset2 = [...dataset]
+
+        dataset2 = dataset2.reduce((a, b) => {
+          let curr = a[a.length - 1]
+          if (curr && curr.tdp === b.tdp) {
+            curr.temperature.push(b.temperature)
+          } else {
+            a.push({
+              temperature: [b.temperature],
+              tdp: b.tdp
+            })
+          }
+          return a
+        }, [])
+        console.log('aa', dataset2)
+
+        dataset2 = dataset2.map(d => {
+          d.category = '露点平均气温'
+          d.temperature = Math.round(d.temperature.reduce((a, b) => a + b) / d.temperature.length)
+          return d
+        })
+
+        console.log(dataset2)
+
+        const { Chart, Scatter, Line, Legend, Tooltip, Axis } = qcharts
+        const chart = new Chart({
+          container: '#app'
+        })
+        let clientRect = { bottom: 50 }
+        chart.source([...dataset, ...dataset2], {
+          row: 'category',
+          value: 'temperature',
+          text: 'tdp'
+        })
+
+        const ds = chart.dataset
+        const d1 = ds.selectRows('平均气温与露点')
+        const d2 = ds.selectRows('露点平均气温')
+        const scatter = new Scatter({
+          clientRect,
+          showGuideLine: true
+        }).source(d1)
+        const line = new Line({ clientRect, layoutX: 'value' }).source(d2)
+        line.style('line', function (attrs, data, i) {
+          return { smooth: true, lineWidth: 3, strokeColor: '#0a0' }
+        })
+        line.style('point', function (attrs) {
+          return { display: 'none' }
+        })
+
+        const toolTip = new Tooltip({
+          title: data => '温度与露点：',
+          formatter: data => {
+            return `温度：${data.temperature}C  露点：${data.tdp}% `
+          }
+        })
+        const legend = new Legend()
+        const axisLeft = new Axis({ orient: 'left', name: 'letf-平均气温与露点', clientRect })
+          .style('axis', false)
+          .style('scale', false)
+          .style('name', { translate: [-60, 0] })
+        const axisBottom = new Axis({ name: 'tdp值', clientRect }).style('name', { translate: [20, 20], fillColor: '#f00' })
+        const axisTop = new Axis({ orient: 'top', name: 'top-折线图坐标', type: 'category' }).source(d2).style('name', { translate: [-30, -30] })
+
+        chart.append([scatter, line, axisBottom, axisLeft, toolTip, legend])
+      })()
+    </script>
+  </body>
+</html>

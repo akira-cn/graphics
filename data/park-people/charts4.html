@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人群-时间-性别</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    #container {
+      width: 600px;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+  <script src="spritejs.js"></script>
+  <script src="https://unpkg.com/@qcharts/core@1.0.25/dist/index.js"></script>
+  <div id="container"></div>
+  <script>
+    const  {Scene, Sprite, Polyline, SpriteSvg} = spritejs;
+    (async function() {
+      const data = await (await fetch('data.json')).json();
+      console.log(data);
+      // group data
+
+      function count(d, dataset) {
+        let place;
+        if(d.x < 300 && d.y < 300) {
+          place = 'square';
+        } else if (d.x >= 300 && d.y < 300) {
+          place = 'sections';
+        } else if (d.x >= 300 && d.y >= 300) {
+          place = 'garden';
+        } else {
+          place = 'playground';
+        }
+        dataset[place] = dataset[place] || [
+          {
+            gender: '男游客',
+            people: 0,
+          },
+          {
+            gender: '女游客',
+            people: 0,
+          }
+        ];
+        if(d.gender === 'f') {
+          dataset[place][0].people++;
+        } else {
+          dataset[place][1].people++;
+        }
+
+        return dataset;
+      }
+
+      function groupData(data) {
+        const dataset = {};
+
+        for(let i = 0; i < data.length; i++) {
+          const d = data[i];
+          
+          if(d.time === 12) {
+            const p = count(d, dataset);
+          }
+        }
+
+        return dataset;
+      }
+
+      const dataset = [];
+      Object.entries(groupData(data)).forEach(([place, d]) => {
+        d[0].place = place;
+        d[1].place = place;
+        dataset.push(...d);
+      });
+      console.log(dataset);
+
+      const { Chart, PolarBar, Legend, Tooltip, theme} = qcharts;
+        const chart = new Chart({
+          container: `#container`
+        });
+
+      theme.set({
+        colors: ['#71dac7', '#d57a77'],
+      });
+
+
+      chart.source(dataset, {
+        row: 'gender',
+        value: 'people',
+        text: 'place',
+      });
+      const bar = new PolarBar({
+        stack: true,
+        radius: 0.8,
+        groupPadAngle: 15,
+      }).style("pillar", {
+        strokeColor: "#FFF",
+        lineWidth: 1,
+      });
+      const tooltip = new Tooltip();
+      const legend = new Legend({ orient: 'vertical', align: ['right', 'center'] });
+
+      chart.append([bar, tooltip, legend]);
+    }());
+  </script>
+</body>
+</html>

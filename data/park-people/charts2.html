@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人群-时间-性别</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+    #container {
+      width: 600px;
+      height: 600px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    #container > div {
+      width: 300px;
+      height: 300px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <script src="spritejs.js"></script>
+  <script src="https://unpkg.com/@qcharts/core@1.0.25/dist/index.js"></script>
+  <div id="container">
+    <div id="square"></div>
+    <div id="sections"></div>
+    <div id="garden"></div>
+    <div id="playground"></div>
+  </div>
+  <script>
+    const  {Scene, Sprite, Polyline, SpriteSvg} = spritejs;
+    (async function() {
+      const data = await (await fetch('data.json')).json();
+      console.log(data);
+      // group data
+
+      function count(d, dataset) {
+        let place;
+        if(d.x < 300 && d.y < 300) {
+          place = 'square';
+        } else if (d.x >= 300 && d.y < 300) {
+          place = 'sections';
+        } else if (d.x >= 300 && d.y >= 300) {
+          place = 'garden';
+        } else {
+          place = 'playground';
+        }
+        dataset[place] = dataset[place] || [
+          {
+            gender: '男游客',
+            people: 0,
+          },
+          {
+            gender: '女游客',
+            people: 0,
+          }
+        ];
+        if(d.gender === 'f') {
+          dataset[place][0].people++;
+        } else {
+          dataset[place][1].people++;
+        }
+
+        return dataset;
+      }
+
+      function groupData(data) {
+        const dataset = {};
+
+        for(let i = 0; i < data.length; i++) {
+          const d = data[i];
+          
+          if(d.time === 12) {
+            const p = count(d, dataset);
+          }
+        }
+
+        return dataset;
+      }
+
+      const dataset = groupData(data);
+      console.log(dataset);
+
+      const { Chart, Pie, Legend, Tooltip, theme} = qcharts;
+
+      theme.set({
+        colors: ['#71dac7', '#d57a77'],
+      });
+
+      Object.entries(dataset).forEach(([key, dataset]) => {
+        const chart = new Chart({
+          container: `#${key}`
+        });
+
+        chart.source(dataset, {
+          row: 'gender',
+          value: 'people',
+          text: 'gender'
+        });
+
+        const pie = new Pie({
+          radius: 0.7,
+          animation: {
+            duration: 700,
+            easing: 'bounceOut'
+          }
+        });
+
+        const legend = new Legend({ orient: 'vertical', align: ['right', 'center'] });
+        const toolTip = new Tooltip();
+
+        chart.append([pie, legend, toolTip]);
+      })
+    }());
+  </script>
+</body>
+</html>
