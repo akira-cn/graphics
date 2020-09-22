@@ -99,9 +99,9 @@
         radius: 0.7
       }).source(ds.selectRows(dataset.filter(d => d.gender === '男游客').map(d => d.place)));
 
-      const legend = new Legend({ orient: 'vertical', align: ['right', 'center'] })
+      const legend = new Legend({ orient: 'vertical', align: ['right', 'center'] });
 
-      chart.append([pie2, pie, legend])
+      chart.append([pie2, pie, legend]);
     }());
   </script>
 </body>

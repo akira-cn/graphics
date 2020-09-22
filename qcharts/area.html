@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基础图形元素</title>
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/spritejs/dist/spritejs.min.js"></script>
+  <script src="https://unpkg.com/@qcharts/core@1.0.25/dist/index.js"></script>
+  <script>
+    const { Chart, Area, Legend, Tooltip, Axis } = qcharts;
+    const chart = new Chart({
+      container: '#app'
+    });
+
+    const data = [
+      { date: '05-01', catgory: '图例一', sales: 15.2 },
+      { date: '05-02', catgory: '图例一', sales: 39.2 },
+      { date: '05-03', catgory: '图例一', sales: 31.2 },
+      { date: '05-04', catgory: '图例一', sales: 65.2 },
+      { date: '05-05', catgory: '图例一', sales: 55.2 },
+      { date: '05-06', catgory: '图例一', sales: 75.2 },
+      { date: '05-07', catgory: '图例一', sales: 95.2 },
+      { date: '05-08', catgory: '图例一', sales: 100 }
+    ];
+
+    chart.source(data, {
+      row: 'catgory',
+      value: 'sales',
+      text: 'date'
+    });
+
+    const area = new Area();
+
+    const axisBottom = new Axis().style("grid", false);
+    const axisLeft = new Axis({ orient: "left" })
+      .style("axis", false);
+    const legend = new Legend();
+    const tooltip = new Tooltip();
+    chart.append([area, axisBottom, axisLeft, legend, tooltip]);
+  </script>
+</body>
+</html>

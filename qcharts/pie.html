@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基础图形元素</title>
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/spritejs/dist/spritejs.min.js"></script>
+  <script src="https://unpkg.com/@qcharts/core@1.0.25/dist/index.js"></script>
+  <script>
+    const { Chart, Pie, Legend, Tooltip, Axis } = qcharts;
+    const chart = new Chart({
+      container: '#app'
+    });
+
+    const data = [
+      { date: '05-01', sales: 15.2 },
+      { date: '05-02', sales: 39.2 },
+      { date: '05-03', sales: 31.2 },
+      { date: '05-04', sales: 65.2 },
+      { date: '05-05', sales: 55.2 },
+      { date: '05-06', sales: 75.2 },
+      { date: '05-07', sales: 95.2 },
+      { date: '05-08', sales: 100 }
+    ];
+
+    chart.source(data, {
+      row: 'date',
+      value: 'sales',
+      text: 'date'
+    });
+
+    const pie = new Pie();
+
+    const legend = new Legend();
+    const tooltip = new Tooltip();
+    chart.append([pie, legend, tooltip]);
+  </script>
+</body>
+</html>

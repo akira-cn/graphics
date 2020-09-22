@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基础图形元素</title>
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/spritejs/dist/spritejs.min.js"></script>
+  <script src="https://unpkg.com/@qcharts/core/dist/index.js"></script>
+  <script>
+    const { Chart, Radar, Legend, Tooltip, Axis } = qcharts;
+    const chart = new Chart({
+      container: '#app'
+    });
+
+    const data = [
+      { date: '体力', category: '诸葛亮', sales: 100 },
+      { date: '武力', category: '诸葛亮', sales: 69 },
+      { date: '智力', category: '诸葛亮', sales: 100 },
+      { date: '统帅', category: '诸葛亮', sales: 95 },
+      { date: '魅力', category: '诸葛亮', sales: 95 },
+      { date: '忠诚', category: '诸葛亮', sales: 100 },
+    ];
+
+    chart.source(data, {
+      row: 'category',
+      value: 'sales',
+      text: 'date'
+    });
+
+    const radar = new Radar().style('scale', false);
+    radar.style('section', (d) => ({ opacity: 0.3 }));
+
+    const legend = new Legend({ align: ['center', '90%'] });
+    const tooltip = new Tooltip();
+    chart.append([radar, legend, tooltip]);
+  </script>
+</body>
+</html>
