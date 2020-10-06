@@ -1,0 +1,46 @@
+{
+  "name": "sprite-geo-earth",
+  "version": "0.2.2",
+  "description": "3D地球可视化组件",
+  "main": "dist/sprite-geo-earth.js",
+  "module": "dist/sprite-geo-earth.esm.js",
+  "scripts": {
+    "start": "webpack-dev-server --env.server=examples --watch-poll",
+    "build": "webpack --env.mode=production & webpack --env.mode=none & webpack --env.mode=none --env.module && cp -R ./examples/lib/* dist",
+    "lib:update": "cp node_modules/spritejs/dist/spritejs.es.min.js examples/lib/spritejs.js && cp node_modules/sprite-extend-3d/dist/sprite-extend-3d.js examples/lib",
+    "demo:dev": "demosify --serve",
+    "demo:prod": "demosify --prod",
+    "prepublishOnly": "npm run build && npm run demo:prod && npm run lap:deploy",
+    "lint": "eslint ./src --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.corp.qihoo.net:qiwoo/vis-geo-earth.git"
+  },
+  "author": "akira-cn",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@demosify/core": "^0.6.0",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "core-js": "^3.6.4",
+    "eslint": "^5.16.0",
+    "eslint-config-sprite": "^1.0.6",
+    "eslint-plugin-html": "^5.0.5",
+    "raw-loader": "^4.0.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "dependencies": {
+    "@purtuga/esm-webpack-plugin": "^1.2.1",
+    "d3-geo": "^1.11.9",
+    "sprite-extend-3d": "^0.9.6",
+    "spritejs": "^3.4.16",
+    "topojson": "^3.0.2"
+  }
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "label": "基础地球仪",
+    "src": "basical"
+  },
+  {
+    "label": "光柱",
+    "src": "beams"
+  },
+  {
+    "label": "标记",
+    "src": "markers"
+  },
+  {
+    "label": "相机",
+    "src": "camera"
+  },
+  {
+    "label": "曲线",
+    "src": "curves"
+  },
+  {
+    "label": "地球纹理",
+    "src": "globe"
+  },
+  {
+    "label": "飞线",
+    "src": "missiles"
+  },
+  {
+    "label": "法线贴图",
+    "src": "normalmap"
+  }
+]
