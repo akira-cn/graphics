@@ -48,7 +48,7 @@
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter(400, 300));
 
-    d3.json('https://s0.ssl.qhres.com/static/f74a79ccf53d8147.json').then(graph => {
+    d3.json('https://s0.ssl.qhres2.com/static/f74a79ccf53d8147.json').then(graph => {
       function ticked() {
         d3.select(layer).selectAll('path')
           .attr('d', (d) => {

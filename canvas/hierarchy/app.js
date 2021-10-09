@@ -1,4 +1,4 @@
-const dataSource = 'https://s5.ssl.qhres.com/static/b0695e2dd30daa64.json';
+const dataSource = 'https://s5.ssl.qhres2.com/static/b0695e2dd30daa64.json';
 
 /* globals d3 */
 (async function () {

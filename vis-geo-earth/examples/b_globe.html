@@ -35,7 +35,7 @@
     const projection = d3.geoEquirectangular();
     projection.scale(projection.scale() * mapScale).translate([mapWidth * mapScale * 0.5, (mapHeight + 2) * mapScale * 0.5]);
 
-    const topojsonData = 'https://s5.ssl.qhres.com/static/843bbd2c37f94f26.json';
+    const topojsonData = 'https://s5.ssl.qhres2.com/static/843bbd2c37f94f26.json';
     
     async function loadMap(src = topojsonData, {strokeColor, fillColor} = {}) {
       const data = await (await fetch(src)).json();
