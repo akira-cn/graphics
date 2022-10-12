@@ -33,9 +33,9 @@ https://akira-cn.github.io/graphics/
 
 - [bezier easing](https://akira-cn.github.io/graphics/animate_webgl/bezier_easing.html)
 - [网格动画](https://akira-cn.github.io/graphics/animate_webgl/cellular-animation.html)
-- [片元着色器旋转](https://akira-cn.github.io/graphics/animate_webgl/fragment_rotation_animation.html)
-- [片元着色器旋转](https://akira-cn.github.io/graphics/animate_webgl/fragment_rotation_animation2.html)
-- [帧动画](https://akira-cn.github.io/graphics/animate_webgl/fragment_animate.html)
+- [片元着色器旋转](https://akira-cn.github.io/graphics/animate_webgl/fragment_rotation_animator.html)
+- [片元着色器旋转](https://akira-cn.github.io/graphics/animate_webgl/fragment_rotation_animator2.html)
+- [帧动画](https://akira-cn.github.io/graphics/animate_webgl/frame_animate.html)
 - [补间easing](https://akira-cn.github.io/graphics/animate_webgl/lerp_easing.html)
 - [补间动画](https://akira-cn.github.io/graphics/animate_webgl/lerp.html)
 - [粒子动画](https://akira-cn.github.io/graphics/animate_webgl/particle.html)
@@ -53,7 +53,6 @@ https://akira-cn.github.io/graphics/
 
 - [基础](https://akira-cn.github.io/graphics/canvas/basic/index.html)
 - [层次结构图](https://akira-cn.github.io/graphics/canvas/hierarchy/index.html)
-- [极坐标](https://akira-cn.github.io/graphics/canvas/polar/index.html)
 
 ## 颜色
 
@@ -91,7 +90,7 @@ https://akira-cn.github.io/graphics/
 
 ## GPU抽奖
 
-- [webgl抽奖](https://akira-cn.github.io/graphics/gl-graffle/index.html)
+- [webgl抽奖](https://akira-cn.github.io/graphics/gl-raffle/index.html)
 
 ## 光照
 
@@ -111,7 +110,7 @@ https://akira-cn.github.io/graphics/
 - [线](https://akira-cn.github.io/graphics/noise/noise-lines.html)
 - [距离场](https://akira-cn.github.io/graphics/noise/noise-sdf.html)
 - [天空](https://akira-cn.github.io/graphics/noise/noise-sky.html)
-- [二维噪声](https://akira-cn.github.io/graphics/noise/noise-2d.html)
+- [二维噪声](https://akira-cn.github.io/graphics/noise/noise2d.html)
 - [simplex](https://akira-cn.github.io/graphics/noise/simplex-noise.html)
 
 ## 法线贴图
@@ -160,8 +159,8 @@ https://akira-cn.github.io/graphics/
 
 ## 多边形-曲线
 
-- [2D曲线](https://akira-cn.github.io/graphics/polygon-curve/canvas2d.html)
-- [挤压曲线](https://akira-cn.github.io/graphics/polygon-curve/webgl-lines-extrude.html)
+- [2D曲线](https://akira-cn.github.io/graphics/polyline-curve/canvas2d.html)
+- [挤压曲线](https://akira-cn.github.io/graphics/polyline-curve/webgl-lines-extrude.html)
 
 ## 重复与随机
 
