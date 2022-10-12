@@ -165,7 +165,7 @@ https://akira-cn.github.io/graphics/
 ## 重复与随机
 
 - [网格](https://akira-cn.github.io/graphics/repeat-and-random/grids.html)
-- [Mandelbrot集](https://akira-cn.github.io/graphics/repeat-and-random/grids.html)
+- [Mandelbrot集](https://akira-cn.github.io/graphics/repeat-and-random/mandelbrot.html)
 - [迷宫](https://akira-cn.github.io/graphics/repeat-and-random/maze.html)
 - [随机一](https://akira-cn.github.io/graphics/repeat-and-random/random.html)
 - [随机二](https://akira-cn.github.io/graphics/repeat-and-random/random2.html)
